@@ -1,19 +1,48 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { ComingSoon } from "@/components/coming-soon";
+import { listListings } from "@/lib/data/listings";
+import { ListingCard } from "@/components/listings/listing-card";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "매물",
-  description: "큐레이션된 지웰시티·롯데 오피스텔 매물.",
+  description: "청주 지웰시티 1·2·3차 + 롯데 오피스텔 큐레이션 매물.",
 };
 
 export default function ListingsPage() {
+  const listings = listListings();
+
   return (
-    <ComingSoon
-      eyebrow="LISTINGS"
-      title="큐레이션 매물"
-      description="개수가 아닌 깊이로 보여드립니다. 매물 사진·도면·운영자 코멘트·실거래가 비교까지 한 페이지에서 확인할 수 있도록 준비 중입니다."
-      sprintLabel="Sprint 3 공개 예정"
-    />
+    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+      <header className="mb-10 max-w-2xl space-y-2">
+        <p className="text-sm font-medium text-primary">LISTINGS</p>
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+          큐레이션 매물
+        </h1>
+        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+          매물 갯수가 아닌 깊이로 보여드립니다. 사이트에 올라오기 전 매물도
+          많으니, 원하시는 조건을 알려주시면 직접 안내드립니다.
+        </p>
+      </header>
+
+      {listings.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-10 text-center">
+          <p className="text-sm text-muted-foreground">
+            현재 공개된 매물이 없습니다. 운영자에게 사전 문의 주시면 사이트에
+            올라오기 전 매물도 안내드려요.
+          </p>
+          <Button asChild variant="outline" size="sm" className="mt-4">
+            <Link href="/contact">사전 문의하기</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {listings.map((listing) => (
+            <ListingCard key={listing.slug} listing={listing} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

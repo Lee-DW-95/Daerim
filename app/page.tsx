@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { siteConfig, toolsNav } from "@/lib/site-config";
+import { listListings } from "@/lib/data/listings";
+import { ListingCard } from "@/components/listings/listing-card";
 
 const heroToolIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   "/tools/compare": GitCompareArrows,
@@ -21,6 +23,7 @@ const heroToolIcons: Record<string, React.ComponentType<{ className?: string }>>
 
 export default function HomePage() {
   const featuredTools = toolsNav.filter((tool) => tool.href in heroToolIcons);
+  const featuredListings = listListings().slice(0, 3);
 
   return (
     <div className="flex flex-col">
@@ -151,15 +154,23 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-10 text-center">
-            <p className="text-sm text-muted-foreground">
-              엄선된 매물을 곧 공개합니다. 운영자에게 직접 의뢰하면 사이트에
-              올라오기 전 매물도 안내받을 수 있어요.
-            </p>
-            <Button asChild variant="outline" size="sm" className="mt-4">
-              <Link href="/contact">사전 문의하기</Link>
-            </Button>
-          </div>
+          {featuredListings.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-10 text-center">
+              <p className="text-sm text-muted-foreground">
+                엄선된 매물을 곧 공개합니다. 운영자에게 직접 의뢰하면 사이트에
+                올라오기 전 매물도 안내받을 수 있어요.
+              </p>
+              <Button asChild variant="outline" size="sm" className="mt-4">
+                <Link href="/contact">사전 문의하기</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredListings.map((listing) => (
+                <ListingCard key={listing.slug} listing={listing} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

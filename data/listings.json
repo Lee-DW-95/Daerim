@@ -1,0 +1,63 @@
+[
+  {
+    "slug": "jiwell-1-49-trade-sample",
+    "complexId": "jiwell-1",
+    "dealKind": "trade",
+    "sizePyeong": 49,
+    "exclusiveAreaSqm": 134.91,
+    "currentFloor": 32,
+    "totalFloor": 50,
+    "direction": "south",
+    "priceManwon": 95000,
+    "availableFrom": "2026-07-01",
+    "status": "available",
+    "publishedAt": "2026-05-07",
+    "headline": "지웰시티 1차 49평 남향 고층, 도심 뷰 + 솔밭초 배정",
+    "agentNote": "1차 49평 남향 매물 중 보기 드문 고층 라인입니다. 큰 가구를 빼고 실측해보면 거실 폭이 같은 평형 다른 라인보다 30cm 정도 더 나옵니다. 다만 입주 후 인테리어 5년 정도 지나서 도배·바닥은 새로 잡으셔야 해요.",
+    "pros": [
+      "32층 남향 — 단지 내 동급 최고 라인",
+      "솔밭초 도보 5분, 복대중 도보 10분",
+      "지웰시티몰·현대백화점 도보권"
+    ],
+    "cons": [
+      "도배·바닥재 교체 권장 (시공비 별도 1,500만원 안팎 예상)",
+      "주상복합 특성상 관리비가 일반 아파트보다 높은 편"
+    ],
+    "features": [
+      "2025년 시스템 에어컨 4대 교체",
+      "주방 빌트인 식기세척기 포함",
+      "발코니 확장형"
+    ],
+    "images": []
+  },
+  {
+    "slug": "jiwell-2-39-jeonse-sample",
+    "complexId": "jiwell-2",
+    "dealKind": "jeonse",
+    "sizePyeong": 39,
+    "exclusiveAreaSqm": 84.99,
+    "currentFloor": 18,
+    "totalFloor": 28,
+    "direction": "southeast",
+    "priceManwon": 50000,
+    "availableFrom": "즉시",
+    "status": "available",
+    "publishedAt": "2026-05-05",
+    "headline": "지웰시티 2차 39평 남동향, SK하이닉스 출퇴근 12분",
+    "agentNote": "신혼부부·자녀 1명 가구에 가장 추천하는 평형입니다. 2차 평면이 1차보다 거실/주방 동선이 깔끔하고, 같은 39평이라도 수납이 더 잘 빠집니다. 보증금 인상 없이 신규 계약 가능합니다.",
+    "pros": [
+      "SK하이닉스 청주캠퍼스 차량 12분 (서청주IC 직진)",
+      "신혼·자녀 1명 가구에 최적인 평면",
+      "보증금 인상 없는 신규 계약"
+    ],
+    "cons": [
+      "주차는 세대당 1대 기준, 추가 차량은 외부 주차 필요"
+    ],
+    "features": [
+      "2024년 도배·장판 시공",
+      "발코니 확장형",
+      "현관 중문 설치 완료"
+    ],
+    "images": []
+  }
+]
