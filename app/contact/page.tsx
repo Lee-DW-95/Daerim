@@ -129,10 +129,11 @@ export default function ContactPage() {
             </div>
             <div className="aspect-[16/9] w-full">
               <KakaoMap
+                address={c.officeAddress}
                 lat={c.officeLat}
                 lng={c.officeLng}
                 level={4}
-                markerLabel={`${siteConfig.name}`}
+                markerLabel={siteConfig.name}
               />
             </div>
           </CardContent>

@@ -19,7 +19,7 @@ export function SiteHeader() {
           aria-label={`${siteConfig.name} 홈으로`}
         >
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold">
-            대림
+            {siteConfig.shortName}
           </span>
           <span className="hidden sm:inline-block text-base">
             {siteConfig.name}

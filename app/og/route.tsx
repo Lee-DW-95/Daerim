@@ -53,7 +53,7 @@ export async function GET(request: Request) {
               fontWeight: 800,
             }}
           >
-            대림
+            {siteConfig.shortName}
           </div>
           <div
             style={{

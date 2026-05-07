@@ -172,10 +172,11 @@ export default function AboutPage() {
         </div>
         <div className="aspect-video w-full">
           <KakaoMap
+            address={c.officeAddress}
             lat={c.officeLat}
             lng={c.officeLng}
             level={4}
-            markerLabel={`${siteConfig.name}`}
+            markerLabel={siteConfig.name}
           />
         </div>
       </section>

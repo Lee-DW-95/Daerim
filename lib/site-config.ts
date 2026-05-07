@@ -5,8 +5,8 @@ export type NavItem = {
 };
 
 export const siteConfig = {
-  name: "대림공인중개사",
-  shortName: "대림",
+  name: "지웰대림공인중개사",
+  shortName: "지웰",
   url: "https://daerim.com",
   description:
     "청주 지웰시티 1·2·3차와 롯데 오피스텔 전담. 11년차 공인중개사가 데이터로 비교하고 솔직하게 안내합니다.",
