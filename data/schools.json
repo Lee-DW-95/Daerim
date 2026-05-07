@@ -1,0 +1,44 @@
+[
+  {
+    "id": "seochon-elem",
+    "name": "서촌초등학교",
+    "level": "elementary",
+    "address": "충북 청주시 흥덕구 복대동",
+    "homepage": null
+  },
+  {
+    "id": "solbat-elem",
+    "name": "솔밭초등학교",
+    "level": "elementary",
+    "address": "충북 청주시 흥덕구 복대동",
+    "homepage": null
+  },
+  {
+    "id": "bokdae-mid",
+    "name": "복대중학교",
+    "level": "middle",
+    "address": "충북 청주시 흥덕구 복대동",
+    "homepage": null
+  },
+  {
+    "id": "seowon-mid",
+    "name": "서원중학교",
+    "level": "middle",
+    "address": "충북 청주시 흥덕구",
+    "homepage": null
+  },
+  {
+    "id": "solbat-mid",
+    "name": "솔밭중학교",
+    "level": "middle",
+    "address": "충북 청주시 흥덕구",
+    "homepage": null
+  },
+  {
+    "id": "heungduk-high",
+    "name": "흥덕고등학교",
+    "level": "high",
+    "address": "충북 청주시 흥덕구",
+    "homepage": null
+  }
+]

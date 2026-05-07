@@ -1,0 +1,110 @@
+[
+  {
+    "id": "jiwell-1",
+    "name": "신영지웰시티 1차",
+    "shortName": "1차",
+    "address": "충청북도 청주시 흥덕구 대농로 17",
+    "buildYear": 2010,
+    "households": 2164,
+    "buildings": null,
+    "type": "주상복합",
+    "maxFloor": 57,
+    "floorAreaRatio": null,
+    "buildingCoverageRatio": null,
+    "parkingTotal": null,
+    "parkingPerHousehold": null,
+    "sizes": [38, 49, 59, 63, 77],
+    "sizeStats": [],
+    "schools": {
+      "elementary": ["서촌초", "솔밭초"],
+      "middle": ["복대중", "서원중", "솔밭중"],
+      "high": ["흥덕고"]
+    },
+    "amenities": {
+      "jiwellMallWalkMin": null,
+      "hyundaiDeptWalkMin": null
+    },
+    "transport": {
+      "hynixCarMin": null,
+      "seocheongjuIcCarMin": null,
+      "osongCarMin": null
+    },
+    "tagline": "지웰시티의 랜드마크. 최고 57층 주상복합, 단지내 상가 풍부.",
+    "agentNotes": {
+      "pros": [],
+      "cons": []
+    }
+  },
+  {
+    "id": "jiwell-2",
+    "name": "두산위브지웰시티 2차",
+    "shortName": "2차",
+    "address": "충청북도 청주시 흥덕구 대농로 55",
+    "buildYear": 2015,
+    "households": 1956,
+    "buildings": null,
+    "type": "아파트",
+    "maxFloor": null,
+    "floorAreaRatio": null,
+    "buildingCoverageRatio": null,
+    "parkingTotal": null,
+    "parkingPerHousehold": null,
+    "sizes": [33, 39, 49, 59],
+    "sizeStats": [],
+    "schools": {
+      "elementary": ["서촌초", "솔밭초"],
+      "middle": ["복대중", "솔밭중"],
+      "high": ["흥덕고"]
+    },
+    "amenities": {
+      "jiwellMallWalkMin": null,
+      "hyundaiDeptWalkMin": null
+    },
+    "transport": {
+      "hynixCarMin": null,
+      "seocheongjuIcCarMin": null,
+      "osongCarMin": null
+    },
+    "tagline": "1차 다음 세대. 평면 개선과 신축 프리미엄.",
+    "agentNotes": {
+      "pros": [],
+      "cons": []
+    }
+  },
+  {
+    "id": "jiwell-3",
+    "name": "청주지웰시티 푸르지오 (3차)",
+    "shortName": "3차",
+    "address": "충청북도 청주시 흥덕구 복대동",
+    "buildYear": 2021,
+    "households": null,
+    "buildings": null,
+    "type": "아파트",
+    "maxFloor": null,
+    "floorAreaRatio": null,
+    "buildingCoverageRatio": null,
+    "parkingTotal": null,
+    "parkingPerHousehold": null,
+    "sizes": [],
+    "sizeStats": [],
+    "schools": {
+      "elementary": ["서촌초", "솔밭초"],
+      "middle": ["복대중"],
+      "high": ["흥덕고"]
+    },
+    "amenities": {
+      "jiwellMallWalkMin": null,
+      "hyundaiDeptWalkMin": null
+    },
+    "transport": {
+      "hynixCarMin": null,
+      "seocheongjuIcCarMin": null,
+      "osongCarMin": null
+    },
+    "tagline": "지웰시티 신축. 최신 평면과 커뮤니티.",
+    "agentNotes": {
+      "pros": [],
+      "cons": []
+    }
+  }
+]
