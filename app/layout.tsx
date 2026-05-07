@@ -40,6 +40,19 @@ export const metadata: Metadata = {
     title: "대림공인중개사 · 청주 지웰시티 전문",
     description:
       "청주 지웰시티 1·2·3차 전담. 데이터로 비교하고, 솔직하게 안내합니다.",
+    images: ["/og?title=대림공인중개사&subtitle=청주 지웰시티 전문, 데이터로 증명합니다."],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "대림공인중개사 · 청주 지웰시티 전문",
+    description:
+      "청주 지웰시티 1·2·3차 전담. 데이터로 비교하고, 솔직하게 안내합니다.",
+    images: ["/og?title=대림공인중개사&subtitle=청주 지웰시티 전문, 데이터로 증명합니다."],
+  },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
   },
 };
 
