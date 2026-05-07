@@ -1,9 +1,6 @@
 import "server-only";
 
-import {
-  createSupabaseServerClient,
-  isSupabaseConfigured,
-} from "@/lib/supabase/server";
+import { getSupabaseAnonClient } from "@/lib/supabase/anon";
 import type { ListingRow } from "@/lib/supabase/types";
 import type { Listing } from "@/lib/types/listing";
 
@@ -40,12 +37,12 @@ function rowToListing(row: ListingRow): Listing {
 }
 
 async function fetchListings(): Promise<Listing[]> {
-  // Supabase 미구성 시 JSON 시드를 fallback으로 사용 (개발 초기 단계 or 빌드 환경).
-  if (!isSupabaseConfigured()) {
+  const supabase = getSupabaseAnonClient();
+  // Supabase 미구성 시 JSON 시드를 fallback으로 사용 (개발 초기 단계 안전망).
+  if (!supabase) {
     return [...legacyListings];
   }
 
-  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("listings")
     .select("*")
