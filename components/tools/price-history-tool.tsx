@@ -113,14 +113,14 @@ export function PriceHistoryTool({ trade, jeonse, monthly, monthLabels }: Props)
     }
     return monthLabels.map((ym) => {
       const s = map.get(ym);
-      // 월세 모드일 때는 차트의 메인 값을 "월세(만원/월)"로 사용.
-      // 보증금은 아래 StatCard에 별도 표시.
+      // 월세 모드: 차트 라인은 월세(만원/월), 보증금은 tooltip에 같이 표시
       if (mode === "monthly") {
         return {
           yearMonth: ym,
           avgManwon: s?.avgMonthlyRent ?? 0,
           medianManwon: s?.avgMonthlyRent ?? 0,
           count: s?.count ?? 0,
+          avgDeposit: s?.avgManwon ?? 0,
         };
       }
       return {

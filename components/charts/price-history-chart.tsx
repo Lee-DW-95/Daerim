@@ -20,6 +20,8 @@ type Point = {
   avgManwon: number;
   medianManwon: number;
   count: number;
+  /** 월세 모드 보조 정보: 평균 보증금 (만원). */
+  avgDeposit?: number;
 };
 
 type Props = {
@@ -45,6 +47,7 @@ export function PriceHistoryChart({
 }: Props) {
   const priceKey = metric === "avg" ? "avgManwon" : "medianManwon";
   const computedLineLabel = lineLabel ?? (metric === "avg" ? "평균가" : "중위값");
+  const isMonthly = unitSuffix === "만원/월";
 
   return (
     <div className="w-full" style={{ height: 340 }}>
@@ -66,7 +69,7 @@ export function PriceHistoryChart({
             orientation="left"
             tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
             tickFormatter={(v: number) =>
-              unitSuffix === "만원/월"
+              isMonthly
                 ? `${v.toLocaleString("ko-KR")}`
                 : formatManwon(v, { unit: "auto", decimals: 1 })
             }
@@ -81,21 +84,54 @@ export function PriceHistoryChart({
             width={48}
           />
           <Tooltip
-            contentStyle={{
-              background: "var(--popover)",
-              border: "1px solid var(--border)",
-              borderRadius: 8,
-              fontSize: 13,
-              color: "var(--popover-foreground)",
-            }}
-            labelFormatter={(label) => formatYearMonth(String(label ?? ""))}
-            formatter={(value, name) => {
-              const v = Number(value);
-              if (name === "거래 건수") return [formatCount(v), name];
-              if (unitSuffix === "만원/월") {
-                return [`${v.toLocaleString("ko-KR")}만원/월`, name];
-              }
-              return [formatManwon(v, { unit: "auto" }), name];
+            cursor={{ stroke: "var(--border)", strokeWidth: 1 }}
+            content={({ active, payload, label }) => {
+              if (!active || !payload || payload.length === 0) return null;
+              const point = payload[0]?.payload as Point | undefined;
+              if (!point) return null;
+              return (
+                <div className="rounded-lg border border-border bg-popover px-3 py-2.5 text-xs shadow-lg">
+                  <p className="mb-1.5 font-semibold text-foreground">
+                    {formatYearMonth(String(label ?? ""))}
+                  </p>
+                  <dl className="space-y-1 tabular-nums">
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="flex items-center gap-1.5 text-muted-foreground">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ background: lineColor }}
+                        />
+                        {computedLineLabel}
+                      </dt>
+                      <dd className="font-semibold text-foreground">
+                        {isMonthly
+                          ? `${point[priceKey].toLocaleString("ko-KR")}만원/월`
+                          : formatManwon(point[priceKey], { unit: "auto" })}
+                      </dd>
+                    </div>
+                    {isMonthly && point.avgDeposit != null && point.avgDeposit > 0 && (
+                      <div className="flex items-center justify-between gap-4">
+                        <dt className="text-muted-foreground">보증금</dt>
+                        <dd className="font-medium text-foreground">
+                          {formatManwon(point.avgDeposit, { unit: "auto" })}
+                        </dd>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between gap-4">
+                      <dt className="flex items-center gap-1.5 text-muted-foreground">
+                        <span
+                          className="h-2 w-2 rounded-sm"
+                          style={{ background: barColor, opacity: 0.5 }}
+                        />
+                        거래 건수
+                      </dt>
+                      <dd className="font-medium text-foreground">
+                        {formatCount(point.count)}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              );
             }}
           />
           <Legend
