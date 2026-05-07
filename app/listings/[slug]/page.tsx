@@ -363,13 +363,20 @@ export default async function ListingDetailPage({
               </div>
             </CardContent>
           </Card>
-          <Button asChild variant="outline" size="sm" className="mt-3">
-            <Link
-              href={`/tools/compare?complex=${complex.id}&size=${listing.sizePyeong}`}
-            >
-              비교 대시보드에서 보기 →
-            </Link>
-          </Button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/complexes/${complex.id}`}>
+                {complex.shortName} 단지 페이지 →
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link
+                href={`/tools/compare?complex=${complex.id}&size=${listing.sizePyeong}`}
+              >
+                다른 단지와 비교 →
+              </Link>
+            </Button>
+          </div>
         </section>
       )}
 

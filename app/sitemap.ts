@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/lib/site-config";
 import { listListings } from "@/lib/data/listings";
+import { listComplexes } from "@/lib/data/complexes";
 import { getAllPosts, getUsedCategories, getUsedTags } from "@/lib/mdx";
 import { toolsNav } from "@/lib/site-config";
 
@@ -28,6 +29,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const tool of toolsNav) {
     items.push({
       url: `${base}${tool.href}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    });
+  }
+
+  for (const complex of listComplexes()) {
+    items.push({
+      url: `${base}/complexes/${complex.id}`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,

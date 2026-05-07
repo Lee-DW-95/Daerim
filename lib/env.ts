@@ -14,6 +14,12 @@ export const serverEnv = {
 export const publicEnv = {
   /** 카카오 지도 JavaScript API 키. 도메인 화이트리스트 필수. */
   kakaoMapKey: process.env.NEXT_PUBLIC_KAKAO_MAP_KEY,
+  /** Google Analytics 4 측정 ID. 비어있으면 GA 미동작. 예: "G-XXXXXXXXXX". */
+  gaId: process.env.NEXT_PUBLIC_GA_ID,
+  /** 네이버 서치어드바이저 사이트 인증 토큰. */
+  naverVerification: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION,
+  /** 구글 서치 콘솔 사이트 인증 토큰. */
+  googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
 } as const;
 
 export function requireServerEnv<K extends keyof typeof serverEnv>(

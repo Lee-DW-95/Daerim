@@ -4,6 +4,8 @@ import { JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { Analytics } from "@/components/analytics";
+import { publicEnv } from "@/lib/env";
 
 import "./globals.css";
 
@@ -54,6 +56,12 @@ export const metadata: Metadata = {
       "application/rss+xml": "/feed.xml",
     },
   },
+  verification: {
+    google: publicEnv.googleVerification,
+    other: publicEnv.naverVerification
+      ? { "naver-site-verification": publicEnv.naverVerification }
+      : undefined,
+  },
 };
 
 export const viewport: Viewport = {
@@ -86,6 +94,7 @@ export default function RootLayout({
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

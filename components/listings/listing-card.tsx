@@ -51,7 +51,9 @@ export function ListingCard({ listing }: Props) {
         </div>
         <CardContent className="space-y-3 p-5">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-medium">{complex?.shortName ?? "단지"}</span>
+            <span className="font-medium text-foreground">
+              {complex?.shortName ?? "단지"}
+            </span>
             <span>·</span>
             <span>{formatPyeong(listing.sizePyeong)}</span>
             <span>·</span>
