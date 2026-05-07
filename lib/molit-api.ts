@@ -24,6 +24,12 @@ const TRADE_ENDPOINT =
 const RENT_ENDPOINT =
   "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent";
 
+const OFFI_TRADE_ENDPOINT =
+  "https://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade";
+
+const OFFI_RENT_ENDPOINT =
+  "https://apis.data.go.kr/1613000/RTMSDataSvcOffiRent/getRTMSDataSvcOffiRent";
+
 /** 빌드 타임 fetch 캐시 갱신 주기: 1일. */
 export const REVALIDATE_SECONDS = 60 * 60 * 24;
 
@@ -66,14 +72,18 @@ function normalizeAptName(name: string): string {
 }
 
 // 실제 국토부 데이터에서 관측되는 단지명 패턴 (정규화 후):
-//   - 신영지웰시티1차, 신영지웰 (약식 표기, 모두 1차로 간주)
-//   - 두산위브지웰시티2차
-//   - 청주지웰시티푸르지오 (3차)
+//   - 아파트:
+//     - 신영지웰시티1차, 신영지웰 (약식 표기, 모두 1차로 간주)
+//     - 두산위브지웰시티2차
+//     - 청주지웰시티푸르지오 (3차)
+//   - 오피스텔:
+//     - 대농지구롯데캐슬시티 (lotte-officetel)
 // 3차 패턴은 1·2차와 겹치지 않도록 "푸르지오" 토큰을 반드시 포함.
 const COMPLEX_PATTERNS: Array<{ id: ComplexId; pattern: RegExp }> = [
   { id: "jiwell-3", pattern: /지웰시티?푸르지오|푸르지오지웰시티/ },
   { id: "jiwell-2", pattern: /두산위브지웰(시티)?(2차)?/ },
   { id: "jiwell-1", pattern: /신영지웰(시티)?(1차)?/ },
+  { id: "lotte-officetel", pattern: /롯데캐슬시티|롯데캐슬오피스텔|롯데오피스텔/ },
 ];
 
 export function matchComplexId(aptNm: string): ComplexId | null {
@@ -109,7 +119,10 @@ const xmlParser = new XMLParser({
 });
 
 type RawTradeItem = {
+  /** 아파트 단지명 (아파트 endpoint). */
   aptNm?: string;
+  /** 오피스텔명 (오피스텔 endpoint). */
+  offiNm?: string;
   dealAmount?: string;
   dealYear?: string | number;
   dealMonth?: string | number;
@@ -201,7 +214,8 @@ async function fetchPage(
   const totalCount = Number(parsed.response?.body?.totalCount ?? 0);
 
   const deals: AptDeal[] = rawItems.map((it) => {
-    const aptNm = String(it.aptNm ?? "").trim();
+    // 아파트 endpoint는 aptNm, 오피스텔 endpoint는 offiNm을 사용합니다.
+    const aptNm = String(it.aptNm ?? it.offiNm ?? "").trim();
     const sqm = Number(it.excluUseAr ?? 0);
     const dealYear = Number(it.dealYear ?? 0);
     const dealMonth = Number(it.dealMonth ?? 0);
@@ -261,7 +275,7 @@ async function fetchAllPages(
   return [...first.deals, ...rest.flat()];
 }
 
-/** 한 달치 매매 거래 전체. */
+/** 한 달치 아파트 매매 거래 전체. */
 export function fetchAptTrades(params: {
   lawdCd: string;
   ymd: string;
@@ -269,12 +283,28 @@ export function fetchAptTrades(params: {
   return fetchAllPages(TRADE_ENDPOINT, "trade", params);
 }
 
-/** 한 달치 전월세 거래 전체. */
+/** 한 달치 아파트 전월세 거래 전체. */
 export function fetchAptRents(params: {
   lawdCd: string;
   ymd: string;
 }): Promise<AptDeal[]> {
   return fetchAllPages(RENT_ENDPOINT, "rent", params);
+}
+
+/** 한 달치 오피스텔 매매 거래 전체. */
+export function fetchOffiTrades(params: {
+  lawdCd: string;
+  ymd: string;
+}): Promise<AptDeal[]> {
+  return fetchAllPages(OFFI_TRADE_ENDPOINT, "trade", params);
+}
+
+/** 한 달치 오피스텔 전월세 거래 전체. */
+export function fetchOffiRents(params: {
+  lawdCd: string;
+  ymd: string;
+}): Promise<AptDeal[]> {
+  return fetchAllPages(OFFI_RENT_ENDPOINT, "rent", params);
 }
 
 /** YYYYMM 문자열 generator. fromYm/toYm 포함, 과거→현재 순. */
@@ -315,16 +345,35 @@ export function recentMonths(months: number, today = new Date()): string[] {
 /**
  * 여러 달치를 한 번에 가져옵니다. 동시 호출은 외부 API 부담을 줄이기 위해
  * 6개씩 청크 단위로 처리합니다.
+ *
+ * @param target 어떤 자료를 가져올지. 기본 "apt-trade".
+ *   - "apt-trade": 아파트 매매 (MOLIT_API_KEY)
+ *   - "apt-rent":  아파트 전월세 (MOLIT_PART_API_KEY)
+ *   - "offi-trade": 오피스텔 매매 (MOLIT_OFFICE_API_KEY)
+ *   - "offi-rent":  오피스텔 전월세 (MOLIT_OFFICE_API_KEY)
  */
-export async function fetchAptTradesRange(params: {
+export type FetchTarget = "apt-trade" | "apt-rent" | "offi-trade" | "offi-rent";
+
+export async function fetchDealsRange(params: {
   lawdCd: string;
   fromYm: string;
   toYm: string;
-  kind?: DealKind;
+  target?: FetchTarget;
 }): Promise<AptDeal[]> {
   const months = Array.from(iterateYearMonth(params.fromYm, params.toYm));
-  const fetcher =
-    params.kind === "rent" ? fetchAptRents : fetchAptTrades;
+  const fetcher = (() => {
+    switch (params.target ?? "apt-trade") {
+      case "apt-rent":
+        return fetchAptRents;
+      case "offi-trade":
+        return fetchOffiTrades;
+      case "offi-rent":
+        return fetchOffiRents;
+      case "apt-trade":
+      default:
+        return fetchAptTrades;
+    }
+  })();
 
   const out: AptDeal[] = [];
   const CHUNK = 6;
@@ -336,6 +385,19 @@ export async function fetchAptTradesRange(params: {
     for (const arr of results) out.push(...arr);
   }
   return out;
+}
+
+/** @deprecated fetchDealsRange로 대체. 하위 호환을 위해 유지. */
+export async function fetchAptTradesRange(params: {
+  lawdCd: string;
+  fromYm: string;
+  toYm: string;
+  kind?: DealKind;
+}): Promise<AptDeal[]> {
+  return fetchDealsRange({
+    ...params,
+    target: params.kind === "rent" ? "apt-rent" : "apt-trade",
+  });
 }
 
 /** 단지×평형×년월 그룹별 통계. */

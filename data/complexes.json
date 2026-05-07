@@ -106,5 +106,36 @@
       "pros": [],
       "cons": []
     }
+  },
+  {
+    "id": "lotte-officetel",
+    "name": "대농지구 롯데캐슬시티",
+    "shortName": "롯데캐슬",
+    "address": "충청북도 청주시 흥덕구 복대동",
+    "buildYear": null,
+    "households": null,
+    "buildings": null,
+    "type": "오피스텔",
+    "maxFloor": null,
+    "floorAreaRatio": null,
+    "buildingCoverageRatio": null,
+    "parkingTotal": null,
+    "parkingPerHousehold": null,
+    "sizes": [],
+    "sizeStats": [],
+    "amenities": {
+      "jiwellMallWalkMin": null,
+      "hyundaiDeptWalkMin": null
+    },
+    "transport": {
+      "hynixCarMin": null,
+      "seocheongjuIcCarMin": null,
+      "osongCarMin": null
+    },
+    "tagline": "복대동 대농지구 롯데캐슬시티 오피스텔. 1인·신혼 거주 + SK하이닉스 임시 거주 인기.",
+    "agentNotes": {
+      "pros": [],
+      "cons": []
+    }
   }
 ]

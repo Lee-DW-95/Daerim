@@ -28,7 +28,8 @@ function toSeries(stats: DealGroupStat[]): PriceHistorySeries[] {
   return stats.map((s) => ({
     complexId: s.complexId,
     sizePyeong: s.sizePyeong,
-    yearMonth: `${s.yearMonth.slice(0, 4)}-${s.yearMonth.slice(4, 6)}`,
+    // groupByComplexSizeMonth가 이미 "YYYY-MM" 포맷으로 반환하므로 변환 불필요.
+    yearMonth: s.yearMonth,
     count: s.count,
     avgManwon: s.avgManwon,
     medianManwon: s.medianManwon,
