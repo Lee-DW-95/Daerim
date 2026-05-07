@@ -5,6 +5,7 @@ import { Phone, MapPin, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { KakaoMap } from "@/components/kakao-map";
 
 export const metadata: Metadata = {
   title: "운영자 소개",
@@ -169,10 +170,13 @@ export default function AboutPage() {
             </CardContent>
           </Card>
         </div>
-        <div className="aspect-video w-full overflow-hidden rounded-xl border border-dashed border-border bg-secondary/40">
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            네이버 지도 임베드 자리 (Sprint 2에서 카카오 지도와 함께 셋업)
-          </div>
+        <div className="aspect-video w-full">
+          <KakaoMap
+            lat={c.officeLat}
+            lng={c.officeLng}
+            level={4}
+            markerLabel={`${siteConfig.name}`}
+          />
         </div>
       </section>
     </div>

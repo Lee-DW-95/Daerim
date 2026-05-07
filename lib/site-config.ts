@@ -27,6 +27,13 @@ export const siteConfig = {
     kakaoChannelUrl: null as string | null,
     officeAddress: "충북 청주시 흥덕구 대농로 45 근린상가 102호",
     officeHours: "평일 09:30 ~ 19:00 / 주말 예약제",
+    /**
+     * 사무실 좌표. 카카오 지도 임베드용.
+     * 정확한 위치가 필요하면 https://map.kakao.com/?q=대농로+45 에서 확인 후 보정.
+     * 현재는 대농로 45 인근 추정값.
+     */
+    officeLat: 36.63944,
+    officeLng: 127.43521,
   },
 
   links: {

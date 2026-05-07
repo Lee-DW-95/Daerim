@@ -4,6 +4,7 @@ import { Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { KakaoMap } from "@/components/kakao-map";
 
 export const metadata: Metadata = {
   title: "문의",
@@ -126,10 +127,13 @@ export default function ContactPage() {
                 </p>
               </div>
             </div>
-            <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-dashed border-border bg-secondary/40">
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                지도 임베드 자리 (카카오 지도 또는 네이버 지도)
-              </div>
+            <div className="aspect-[16/9] w-full">
+              <KakaoMap
+                lat={c.officeLat}
+                lng={c.officeLng}
+                level={4}
+                markerLabel={`${siteConfig.name}`}
+              />
             </div>
           </CardContent>
         </Card>
