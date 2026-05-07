@@ -26,83 +26,112 @@ type Props = {
 };
 
 export function ListingsBrowser({ listings }: Props) {
-  const [complexId, setComplexId] = React.useState<ComplexId | "all">("all");
-  const [dealKind, setDealKind] = React.useState<ListingDealKind | "all">("all");
-  const [sizePyeong, setSizePyeong] = React.useState<number | "all">("all");
+  // 다중 선택. 빈 set = 전체.
+  const [complexIds, setComplexIds] = React.useState<Set<ComplexId>>(new Set());
+  const [dealKinds, setDealKinds] = React.useState<Set<ListingDealKind>>(
+    new Set()
+  );
+  const [sizes, setSizes] = React.useState<Set<number>>(new Set());
   const [sort, setSort] = React.useState<SortKey>("latest");
 
-  const availableComplexes = React.useMemo(() => {
-    const ids = new Set(listings.map((l) => l.complexId));
-    return complexes.filter((c) => ids.has(c.id));
-  }, [listings]);
+  // 어드민 등록 폼과 일관되게 모든 단지를 chip으로 노출.
+  // 매물 0건인 단지도 chip은 보이고, 카운트로 빈 상태를 표시.
+  const allComplexes = React.useMemo(() => complexes, []);
 
-  const availableSizes = React.useMemo(() => {
-    const sizes = new Set<number>();
+  const countByComplex = React.useMemo(() => {
+    const m = new Map<ComplexId, number>();
+    for (const c of allComplexes) m.set(c.id, 0);
     for (const l of listings) {
-      if (complexId !== "all" && l.complexId !== complexId) continue;
-      sizes.add(l.sizePyeong);
+      m.set(l.complexId, (m.get(l.complexId) ?? 0) + 1);
     }
-    return [...sizes].sort((a, b) => a - b);
-  }, [listings, complexId]);
+    return m;
+  }, [listings, allComplexes]);
 
-  // 단지 변경 시 평형 필터 자동 보정.
-  React.useEffect(() => {
-    if (sizePyeong !== "all" && !availableSizes.includes(sizePyeong)) {
-      setSizePyeong("all");
+  // 평형 칩은 "현재 단지 필터에 매칭되는 매물의 평형"만 보여줌.
+  const availableSizes = React.useMemo(() => {
+    const set = new Set<number>();
+    for (const l of listings) {
+      if (complexIds.size > 0 && !complexIds.has(l.complexId)) continue;
+      if (dealKinds.size > 0 && !dealKinds.has(l.dealKind)) continue;
+      set.add(l.sizePyeong);
     }
-  }, [availableSizes, sizePyeong]);
+    return [...set].sort((a, b) => a - b);
+  }, [listings, complexIds, dealKinds]);
+
+  // 단지/거래유형 변경 시 평형 선택 중 사라진 것 자동 정리.
+  React.useEffect(() => {
+    setSizes((prev) => {
+      const next = new Set(
+        [...prev].filter((p) => availableSizes.includes(p))
+      );
+      return next.size === prev.size ? prev : next;
+    });
+  }, [availableSizes]);
 
   const filtered = React.useMemo(() => {
     const f = listings.filter((l) => {
-      if (complexId !== "all" && l.complexId !== complexId) return false;
-      if (dealKind !== "all" && l.dealKind !== dealKind) return false;
-      if (sizePyeong !== "all" && l.sizePyeong !== sizePyeong) return false;
+      if (complexIds.size > 0 && !complexIds.has(l.complexId)) return false;
+      if (dealKinds.size > 0 && !dealKinds.has(l.dealKind)) return false;
+      if (sizes.size > 0 && !sizes.has(l.sizePyeong)) return false;
       return true;
     });
 
-    if (sort === "priceAsc") return [...f].sort((a, b) => a.priceManwon - b.priceManwon);
-    if (sort === "priceDesc") return [...f].sort((a, b) => b.priceManwon - a.priceManwon);
+    if (sort === "priceAsc")
+      return [...f].sort((a, b) => a.priceManwon - b.priceManwon);
+    if (sort === "priceDesc")
+      return [...f].sort((a, b) => b.priceManwon - a.priceManwon);
     return [...f].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
-  }, [listings, complexId, dealKind, sizePyeong, sort]);
+  }, [listings, complexIds, dealKinds, sizes, sort]);
 
-  const activeFilters =
-    Number(complexId !== "all") +
-    Number(dealKind !== "all") +
-    Number(sizePyeong !== "all");
+  const activeFilters = complexIds.size + dealKinds.size + sizes.size;
+
+  const toggle = <T,>(set: Set<T>, value: T): Set<T> => {
+    const next = new Set(set);
+    if (next.has(value)) next.delete(value);
+    else next.add(value);
+    return next;
+  };
 
   return (
     <div className="space-y-6">
       <div className="space-y-4 rounded-2xl border border-border bg-card p-4 md:p-6">
-        <FilterRow label="단지">
-          <FilterChip
-            active={complexId === "all"}
-            onClick={() => setComplexId("all")}
-          >
-            전체
-          </FilterChip>
-          {availableComplexes.map((c) => (
-            <FilterChip
-              key={c.id}
-              active={complexId === c.id}
-              onClick={() => setComplexId(c.id)}
-            >
-              {c.shortName}
-            </FilterChip>
-          ))}
+        <FilterRow
+          label="단지"
+          hint={complexIds.size === 0 ? "전체" : `${complexIds.size}개 선택`}
+        >
+          {allComplexes.map((c) => {
+            const count = countByComplex.get(c.id) ?? 0;
+            const active = complexIds.has(c.id);
+            return (
+              <FilterChip
+                key={c.id}
+                active={active}
+                onClick={() => setComplexIds((prev) => toggle(prev, c.id))}
+                disabled={count === 0 && !active}
+              >
+                <span>{c.shortName}</span>
+                <span
+                  className={cn(
+                    "ml-1.5 text-[10px] tabular-nums",
+                    active ? "text-primary-foreground/80" : "text-muted-foreground"
+                  )}
+                >
+                  {count}
+                </span>
+              </FilterChip>
+            );
+          })}
         </FilterRow>
 
-        <FilterRow label="거래 유형">
-          <FilterChip
-            active={dealKind === "all"}
-            onClick={() => setDealKind("all")}
-          >
-            전체
-          </FilterChip>
+        <FilterRow
+          label="거래 유형"
+          hint={dealKinds.size === 0 ? "전체" : `${dealKinds.size}개 선택`}
+        >
           {(Object.keys(DEAL_KIND_LABEL) as ListingDealKind[]).map((k) => (
             <FilterChip
               key={k}
-              active={dealKind === k}
-              onClick={() => setDealKind(k)}
+              active={dealKinds.has(k)}
+              onClick={() => setDealKinds((prev) => toggle(prev, k))}
             >
               {DEAL_KIND_LABEL[k]}
             </FilterChip>
@@ -110,18 +139,15 @@ export function ListingsBrowser({ listings }: Props) {
         </FilterRow>
 
         {availableSizes.length > 0 && (
-          <FilterRow label="평형">
-            <FilterChip
-              active={sizePyeong === "all"}
-              onClick={() => setSizePyeong("all")}
-            >
-              전체
-            </FilterChip>
+          <FilterRow
+            label="평형"
+            hint={sizes.size === 0 ? "전체" : `${sizes.size}개 선택`}
+          >
             {availableSizes.map((p) => (
               <FilterChip
                 key={p}
-                active={sizePyeong === p}
-                onClick={() => setSizePyeong(p)}
+                active={sizes.has(p)}
+                onClick={() => setSizes((prev) => toggle(prev, p))}
               >
                 {p}평
               </FilterChip>
@@ -140,9 +166,9 @@ export function ListingsBrowser({ listings }: Props) {
                 <button
                   type="button"
                   onClick={() => {
-                    setComplexId("all");
-                    setDealKind("all");
-                    setSizePyeong("all");
+                    setComplexIds(new Set());
+                    setDealKinds(new Set());
+                    setSizes(new Set());
                   }}
                   className="ml-2 text-primary underline-offset-4 hover:underline"
                 >
@@ -186,9 +212,11 @@ export function ListingsBrowser({ listings }: Props) {
 
 function FilterRow({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -196,7 +224,14 @@ function FilterRow({
       <span className="min-w-[64px] text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </span>
-      <div className="flex flex-wrap gap-1.5">{children}</div>
+      <div className="flex flex-1 flex-wrap items-center gap-1.5">
+        {children}
+      </div>
+      {hint && (
+        <span className="text-[11px] text-muted-foreground tabular-nums">
+          {hint}
+        </span>
+      )}
     </div>
   );
 }
@@ -204,21 +239,26 @@ function FilterRow({
 function FilterChip({
   active,
   onClick,
+  disabled,
   children,
 }: {
   active: boolean;
   onClick: () => void;
+  disabled?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
+      aria-pressed={active}
       className={cn(
-        "rounded-full border px-3 py-1 text-sm font-medium transition-colors",
+        "inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors",
         active
           ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-background text-foreground hover:bg-secondary"
+          : "border-border bg-background text-foreground hover:bg-secondary",
+        disabled && "cursor-not-allowed opacity-50 hover:bg-background"
       )}
     >
       {children}

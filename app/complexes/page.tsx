@@ -29,9 +29,7 @@ export default function ComplexesIndexPage() {
       </header>
 
       <div className="grid gap-5 md:grid-cols-3">
-        {complexes
-          .filter((c) => c.id !== "lotte-officetel")
-          .map((c) => (
+        {complexes.map((c) => (
             <Link
               key={c.id}
               href={`/complexes/${c.id}`}
