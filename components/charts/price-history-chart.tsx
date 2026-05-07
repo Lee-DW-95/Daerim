@@ -29,6 +29,10 @@ type Props = {
   lineColor?: string;
   /** 막대 색상. */
   barColor?: string;
+  /** 라인 라벨 (tooltip에 표시). 기본 "평균가"/"중위값". */
+  lineLabel?: string;
+  /** y축 단위 표시 ("만원", "만원/월" 등). 기본 "만원". */
+  unitSuffix?: string;
 };
 
 export function PriceHistoryChart({
@@ -36,8 +40,11 @@ export function PriceHistoryChart({
   metric,
   lineColor = "var(--chart-1)",
   barColor = "var(--chart-2)",
+  lineLabel,
+  unitSuffix = "만원",
 }: Props) {
   const priceKey = metric === "avg" ? "avgManwon" : "medianManwon";
+  const computedLineLabel = lineLabel ?? (metric === "avg" ? "평균가" : "중위값");
 
   return (
     <div className="w-full" style={{ height: 340 }}>
@@ -58,7 +65,11 @@ export function PriceHistoryChart({
             yAxisId="price"
             orientation="left"
             tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-            tickFormatter={(v: number) => formatManwon(v, { unit: "auto", decimals: 1 })}
+            tickFormatter={(v: number) =>
+              unitSuffix === "만원/월"
+                ? `${v.toLocaleString("ko-KR")}`
+                : formatManwon(v, { unit: "auto", decimals: 1 })
+            }
             width={70}
           />
           <YAxis
@@ -81,6 +92,9 @@ export function PriceHistoryChart({
             formatter={(value, name) => {
               const v = Number(value);
               if (name === "거래 건수") return [formatCount(v), name];
+              if (unitSuffix === "만원/월") {
+                return [`${v.toLocaleString("ko-KR")}만원/월`, name];
+              }
               return [formatManwon(v, { unit: "auto" }), name];
             }}
           />
@@ -102,7 +116,7 @@ export function PriceHistoryChart({
             yAxisId="price"
             type="monotone"
             dataKey={priceKey}
-            name={metric === "avg" ? "평균가" : "중위값"}
+            name={computedLineLabel}
             stroke={lineColor}
             strokeWidth={2.5}
             dot={{ r: 3 }}

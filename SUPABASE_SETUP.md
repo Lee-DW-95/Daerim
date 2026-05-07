@@ -55,14 +55,14 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
 - RLS 정책 (공개 읽기 + 인증 사용자만 수정)
 - `listing-images` 스토리지 버킷 + 권한
 
-## 4. (선택) 시드 매물 마이그레이션
+## 4. 시드 매물 (실행 불필요)
 
-기존 `data/listings.json`의 샘플 매물 2건을 DB로 옮기시려면:
+이전 버전에서 사용했던 `supabase/seed.sql`은 현재 비어있습니다.
+운영자가 어드민(`/admin/listings`)에서 직접 등록한 매물만 사이트에 노출되도록
+정리됐어요. 이 단계는 건너뛰셔도 됩니다.
 
-1. SQL Editor → New query
-2. [`supabase/seed.sql`](./supabase/seed.sql) 내용 복붙 → Run
-
-샘플 매물이 필요 없으면 이 단계는 생략.
+이전에 시드 매물(`jiwell-1-49-trade-sample` 등)을 DB에 INSERT하셨다면 어드민의
+매물 관리 페이지에서 직접 삭제해주세요.
 
 ## 5. 운영자 계정 생성
 

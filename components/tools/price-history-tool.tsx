@@ -113,6 +113,16 @@ export function PriceHistoryTool({ trade, jeonse, monthly, monthLabels }: Props)
     }
     return monthLabels.map((ym) => {
       const s = map.get(ym);
+      // 월세 모드일 때는 차트의 메인 값을 "월세(만원/월)"로 사용.
+      // 보증금은 아래 StatCard에 별도 표시.
+      if (mode === "monthly") {
+        return {
+          yearMonth: ym,
+          avgManwon: s?.avgMonthlyRent ?? 0,
+          medianManwon: s?.avgMonthlyRent ?? 0,
+          count: s?.count ?? 0,
+        };
+      }
       return {
         yearMonth: ym,
         avgManwon: s?.avgManwon ?? 0,
@@ -120,7 +130,7 @@ export function PriceHistoryTool({ trade, jeonse, monthly, monthLabels }: Props)
         count: s?.count ?? 0,
       };
     });
-  }, [stats, complexId, sizePyeong, monthLabels]);
+  }, [stats, complexId, sizePyeong, monthLabels, mode]);
 
   const points = chartData.filter((p) => p.count > 0);
   const totalDeals = points.reduce((sum, p) => sum + p.count, 0);
@@ -142,6 +152,18 @@ export function PriceHistoryTool({ trade, jeonse, monthly, monthLabels }: Props)
       (acc, s) => acc + (s.avgMonthlyRent ?? 0) * s.count,
       0
     );
+    return Math.round(sum / totalCount);
+  }, [mode, complexId, sizePyeong, monthly]);
+
+  // 월세 모드에서 보여줄 평균 보증금 (별도 카드에 표시)
+  const monthlyDepositAvg = React.useMemo(() => {
+    if (mode !== "monthly" || !complexId || sizePyeong == null) return 0;
+    const filtered = monthly.filter(
+      (s) => s.complexId === complexId && s.sizePyeong === sizePyeong
+    );
+    const totalCount = filtered.reduce((sum, s) => sum + s.count, 0);
+    if (totalCount === 0) return 0;
+    const sum = filtered.reduce((acc, s) => acc + s.avgManwon * s.count, 0);
     return Math.round(sum / totalCount);
   }, [mode, complexId, sizePyeong, monthly]);
 
@@ -239,44 +261,72 @@ export function PriceHistoryTool({ trade, jeonse, monthly, monthLabels }: Props)
           value={points.length === 0 ? "—" : formatCount(totalDeals)}
           hint={`${monthLabels.length}개월`}
         />
-        <StatCard
-          label={metric === "avg" ? `평균 ${PRICE_LABEL[mode]}` : `중위 ${PRICE_LABEL[mode]}`}
-          value={overallAvg ? formatManwon(overallAvg, { unit: "auto" }) : "—"}
-        />
-        <StatCard
-          label="최고가"
-          value={
-            points.length === 0
-              ? "—"
-              : formatManwon(
-                  Math.max(
-                    ...points.map((p) =>
-                      metric === "avg" ? p.avgManwon : p.medianManwon
+        {mode === "monthly" ? (
+          <>
+            <StatCard
+              label="평균 월세"
+              value={
+                monthlyRentAvg
+                  ? `${monthlyRentAvg.toLocaleString("ko-KR")}만원/월`
+                  : "—"
+              }
+              hint="차트의 라인 값"
+            />
+            <StatCard
+              label="평균 보증금"
+              value={
+                monthlyDepositAvg
+                  ? formatManwon(monthlyDepositAvg, { unit: "auto" })
+                  : "—"
+              }
+            />
+            <StatCard
+              label="최고 월세"
+              value={
+                points.length === 0
+                  ? "—"
+                  : `${Math.max(...points.map((p) => p.avgManwon)).toLocaleString("ko-KR")}만원/월`
+              }
+            />
+          </>
+        ) : (
+          <>
+            <StatCard
+              label={metric === "avg" ? `평균 ${PRICE_LABEL[mode]}` : `중위 ${PRICE_LABEL[mode]}`}
+              value={overallAvg ? formatManwon(overallAvg, { unit: "auto" }) : "—"}
+            />
+            <StatCard
+              label="최고가"
+              value={
+                points.length === 0
+                  ? "—"
+                  : formatManwon(
+                      Math.max(
+                        ...points.map((p) =>
+                          metric === "avg" ? p.avgManwon : p.medianManwon
+                        )
+                      ),
+                      { unit: "auto" }
                     )
-                  ),
-                  { unit: "auto" }
-                )
-          }
-        />
-        <StatCard
-          label={mode === "monthly" ? "평균 월세" : "최저가"}
-          value={
-            mode === "monthly"
-              ? monthlyRentAvg
-                ? `${monthlyRentAvg.toLocaleString("ko-KR")}만원/월`
-                : "—"
-              : points.length === 0
-                ? "—"
-                : formatManwon(
-                    Math.min(
-                      ...points.map((p) =>
-                        metric === "avg" ? p.avgManwon : p.medianManwon
-                      )
-                    ),
-                    { unit: "auto" }
-                  )
-          }
-        />
+              }
+            />
+            <StatCard
+              label="최저가"
+              value={
+                points.length === 0
+                  ? "—"
+                  : formatManwon(
+                      Math.min(
+                        ...points.map((p) =>
+                          metric === "avg" ? p.avgManwon : p.medianManwon
+                        )
+                      ),
+                      { unit: "auto" }
+                    )
+              }
+            />
+          </>
+        )}
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 md:p-6">

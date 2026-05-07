@@ -78,6 +78,15 @@ export function ComplexPriceTrend({
     }
     return monthLabels.map((ym) => {
       const s = map.get(ym);
+      // 월세 모드: 차트 라인은 월세(만원/월), 보증금은 별도 표시
+      if (mode === "monthly") {
+        return {
+          yearMonth: ym,
+          avgManwon: s?.avgMonthlyRent ?? 0,
+          medianManwon: s?.avgMonthlyRent ?? 0,
+          count: s?.count ?? 0,
+        };
+      }
       return {
         yearMonth: ym,
         avgManwon: s?.avgManwon ?? 0,
@@ -85,7 +94,7 @@ export function ComplexPriceTrend({
         count: s?.count ?? 0,
       };
     });
-  }, [stats, size, monthLabels]);
+  }, [stats, size, monthLabels, mode]);
 
   const points = chartData.filter((p) => p.count > 0);
   const totalDeals = points.reduce((sum, p) => sum + p.count, 0);
@@ -95,6 +104,17 @@ export function ComplexPriceTrend({
       : Math.round(
           points.reduce((s, p) => s + p.avgManwon * p.count, 0) / totalDeals
         );
+
+  // 월세 모드 전용: 평균 보증금 (별도 표시)
+  const monthlyDepositAvg = React.useMemo(() => {
+    if (mode !== "monthly" || size == null) return 0;
+    const filtered = monthly.filter((s) => s.sizePyeong === size);
+    const totalCount = filtered.reduce((sum, s) => sum + s.count, 0);
+    if (totalCount === 0) return 0;
+    return Math.round(
+      filtered.reduce((acc, s) => acc + s.avgManwon * s.count, 0) / totalCount
+    );
+  }, [mode, size, monthly]);
 
   // 모든 거래 유형 데이터 0건이면 안내만
   const totalAcrossModes = trade.length + jeonse.length + monthly.length;
@@ -156,13 +176,35 @@ export function ComplexPriceTrend({
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span>
-            평균 {PRICE_LABEL[mode]}{" "}
-            <strong className="text-foreground tabular-nums">
-              {overallAvg ? formatManwon(overallAvg, { unit: "auto" }) : "—"}
-            </strong>
-          </span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          {mode === "monthly" ? (
+            <>
+              <span>
+                평균 월세{" "}
+                <strong className="text-foreground tabular-nums">
+                  {overallAvg
+                    ? `${overallAvg.toLocaleString("ko-KR")}만원/월`
+                    : "—"}
+                </strong>
+              </span>
+              <span>·</span>
+              <span>
+                평균 보증금{" "}
+                <strong className="text-foreground tabular-nums">
+                  {monthlyDepositAvg
+                    ? formatManwon(monthlyDepositAvg, { unit: "auto" })
+                    : "—"}
+                </strong>
+              </span>
+            </>
+          ) : (
+            <span>
+              평균 {PRICE_LABEL[mode]}{" "}
+              <strong className="text-foreground tabular-nums">
+                {overallAvg ? formatManwon(overallAvg, { unit: "auto" }) : "—"}
+              </strong>
+            </span>
+          )}
           <span>·</span>
           <span>
             거래{" "}
@@ -182,7 +224,12 @@ export function ComplexPriceTrend({
           선택한 평형의 {DEAL_MODE_LABEL[mode]} 거래 기록이 없습니다.
         </div>
       ) : (
-        <PriceHistoryChart data={chartData} metric="avg" />
+        <PriceHistoryChart
+          data={chartData}
+          metric="avg"
+          lineLabel={mode === "monthly" ? "월세" : undefined}
+          unitSuffix={mode === "monthly" ? "만원/월" : "만원"}
+        />
       )}
     </div>
   );
