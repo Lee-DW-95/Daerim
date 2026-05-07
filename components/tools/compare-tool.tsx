@@ -185,7 +185,10 @@ export function CompareTool({ trade, monthLabels }: Props) {
         </div>
         <div className="rounded-xl border border-border bg-card p-4 md:p-6">
           {series.length === 0 ? (
-            <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground sm:h-[340px] md:h-[380px]">
+            <div
+              className="flex w-full items-center justify-center text-sm text-muted-foreground"
+              style={{ height: 360 }}
+            >
               비교할 단지를 선택해주세요.
             </div>
           ) : (

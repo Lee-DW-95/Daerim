@@ -50,8 +50,8 @@ export function MultiComplexChart({ monthLabels, series }: Props) {
   }, [monthLabels, series]);
 
   return (
-    <div className="h-[300px] w-full sm:h-[340px] md:h-[380px]">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full" style={{ height: 360 }}>
+      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <LineChart data={data} margin={{ top: 16, right: 24, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
           <XAxis
