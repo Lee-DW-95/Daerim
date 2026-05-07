@@ -97,7 +97,7 @@ export function ComplexPriceTrend({ trade, monthLabels }: Props) {
         </div>
       </div>
       {points.length === 0 ? (
-        <div className="flex h-[360px] items-center justify-center text-sm text-muted-foreground">
+        <div className="flex h-[280px] items-center justify-center text-sm text-muted-foreground sm:h-[320px] md:h-[360px]">
           선택한 평형의 거래 기록이 없습니다.
         </div>
       ) : (

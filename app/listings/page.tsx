@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { listListings } from "@/lib/data/listings";
-import { ListingCard } from "@/components/listings/listing-card";
+import { ListingsBrowser } from "@/components/listings/listings-browser";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "매물",
-  description: "청주 지웰시티 1·2·3차 + 롯데 오피스텔 큐레이션 매물.",
+  description:
+    "청주 지웰시티 1·2·3차 + 롯데 오피스텔 큐레이션 매물. 단지·거래유형·평형으로 필터링하세요.",
 };
 
 export default function ListingsPage() {
@@ -37,11 +38,7 @@ export default function ListingsPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {listings.map((listing) => (
-            <ListingCard key={listing.slug} listing={listing} />
-          ))}
-        </div>
+        <ListingsBrowser listings={listings} />
       )}
     </div>
   );

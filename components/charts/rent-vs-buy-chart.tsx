@@ -29,7 +29,7 @@ const COLORS = {
 
 export function RentVsBuyChart({ data }: Props) {
   return (
-    <div className="h-[360px] w-full">
+    <div className="h-[280px] w-full sm:h-[320px] md:h-[360px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 16, right: 24, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />

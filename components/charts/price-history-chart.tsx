@@ -40,7 +40,7 @@ export function PriceHistoryChart({
   const priceKey = metric === "avg" ? "avgManwon" : "medianManwon";
 
   return (
-    <div className="h-[360px] w-full">
+    <div className="h-[280px] w-full sm:h-[320px] md:h-[360px]">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={data}

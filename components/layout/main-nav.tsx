@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { mainNav, toolsNav } from "@/lib/site-config";
+import { mainNav, toolsNav, complexesNav } from "@/lib/site-config";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,7 +28,14 @@ export function MainNav() {
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
         {mainNav.map((item) => {
-          if (item.href === "/tools") {
+          const dropdownItems =
+            item.href === "/tools"
+              ? toolsNav
+              : item.href === "/complexes"
+                ? complexesNav
+                : null;
+
+          if (dropdownItems) {
             return (
               <NavigationMenuItem key={item.href}>
                 <NavigationMenuTrigger
@@ -39,20 +46,20 @@ export function MainNav() {
                   {item.title}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[420px] gap-2 p-3 md:w-[520px] md:grid-cols-2">
-                    {toolsNav.map((tool) => (
-                      <li key={tool.href}>
+                  <ul className="grid w-[360px] gap-2 p-3 md:w-[460px] md:grid-cols-2">
+                    {dropdownItems.map((d) => (
+                      <li key={d.href}>
                         <NavigationMenuLink asChild>
                           <Link
-                            href={tool.href}
+                            href={d.href}
                             className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">
-                              {tool.title}
+                              {d.title}
                             </div>
-                            {tool.description && (
+                            {d.description && (
                               <p className="mt-1.5 line-clamp-2 text-xs leading-snug text-muted-foreground">
-                                {tool.description}
+                                {d.description}
                               </p>
                             )}
                           </Link>

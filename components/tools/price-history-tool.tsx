@@ -233,7 +233,7 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
 
       <div className="rounded-xl border border-border bg-card p-4 md:p-6">
         {currentSeriesPoints.length === 0 ? (
-          <div className="flex h-[360px] items-center justify-center text-sm text-muted-foreground">
+          <div className="flex h-[280px] items-center justify-center text-sm text-muted-foreground sm:h-[320px] md:h-[360px]">
             선택한 단지·평형의 거래 기록이 없습니다.
           </div>
         ) : (

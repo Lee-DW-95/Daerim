@@ -44,11 +44,30 @@ export const siteConfig = {
 
 export const mainNav: NavItem[] = [
   { title: "홈", href: "/" },
+  { title: "단지", href: "/complexes" },
   { title: "도구", href: "/tools" },
   { title: "매물", href: "/listings" },
   { title: "블로그", href: "/blog" },
   { title: "소개", href: "/about" },
   { title: "문의", href: "/contact" },
+];
+
+export const complexesNav: NavItem[] = [
+  {
+    title: "지웰시티 1차",
+    href: "/complexes/jiwell-1",
+    description: "신영지웰시티 1차 (2010, 주상복합 57층)",
+  },
+  {
+    title: "지웰시티 2차",
+    href: "/complexes/jiwell-2",
+    description: "두산위브지웰시티 2차 (2015, 평면 개선)",
+  },
+  {
+    title: "지웰시티 3차",
+    href: "/complexes/jiwell-3",
+    description: "청주지웰시티 푸르지오 (2021, 신축)",
+  },
 ];
 
 export const toolsNav: NavItem[] = [

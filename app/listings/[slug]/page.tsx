@@ -139,6 +139,8 @@ export default async function ListingDetailPage({
               <img
                 src={listing.images[0]}
                 alt={listing.headline}
+                loading="eager"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -158,6 +160,8 @@ export default async function ListingDetailPage({
                   <img
                     src={listing.images[idx]}
                     alt={`${listing.headline} ${idx}`}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : null}

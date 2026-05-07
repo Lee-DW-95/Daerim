@@ -6,7 +6,12 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { mainNav, toolsNav, siteConfig } from "@/lib/site-config";
+import {
+  mainNav,
+  toolsNav,
+  complexesNav,
+  siteConfig,
+} from "@/lib/site-config";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -61,24 +66,26 @@ export function MobileNav() {
               >
                 {item.title}
               </Link>
-              {item.href === "/tools" && (
+              {(item.href === "/tools" || item.href === "/complexes") && (
                 <ul className="ml-3 mb-1 flex flex-col gap-0.5 border-l border-border pl-3">
-                  {toolsNav.map((tool) => (
-                    <li key={tool.href}>
-                      <Link
-                        href={tool.href}
-                        onClick={close}
-                        className={cn(
-                          "block rounded-md px-3 py-2 text-sm transition-colors",
-                          isActive(tool.href)
-                            ? "text-primary font-medium"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        {tool.title}
-                      </Link>
-                    </li>
-                  ))}
+                  {(item.href === "/tools" ? toolsNav : complexesNav).map(
+                    (sub) => (
+                      <li key={sub.href}>
+                        <Link
+                          href={sub.href}
+                          onClick={close}
+                          className={cn(
+                            "block rounded-md px-3 py-2 text-sm transition-colors",
+                            isActive(sub.href)
+                              ? "text-primary font-medium"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          {sub.title}
+                        </Link>
+                      </li>
+                    )
+                  )}
                 </ul>
               )}
             </React.Fragment>

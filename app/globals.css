@@ -159,9 +159,32 @@
   html {
     @apply font-sans;
   }
+  /* 키보드 포커스 표시를 명확히 (마우스 클릭에는 영향 없음) */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
   /* 숫자/데이터 가독성을 위한 tabular figures 옵션 */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
+  }
+  /* 모션 줄이기 환경 존중 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  /* 한국어 본문 가독성: word-break + line-break */
+  .prose-custom {
+    word-break: keep-all;
+    line-break: strict;
+    overflow-wrap: break-word;
   }
 }
