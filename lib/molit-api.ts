@@ -103,30 +103,64 @@ export function matchComplexId(aptNm: string): ComplexId | null {
 /**
  * 전용면적(㎡) → 한국 부동산 시장에서 통용되는 평형(반올림).
  *
- * 한국 부동산은 보통 "공급면적 평수"로 평형을 표기합니다 (예: 33평형, 49평형).
- * 같은 매물도 전용면적 평수는 33평형 → 25.7평, 49평형 → 34.4평 등으로
- * 약 1.3배 차이가 나서 그대로 표시하면 시장 표기와 어긋납니다.
+ * 정확도 확보를 위해 단지별 매핑 테이블을 우선 적용합니다.
+ *  - 매칭된 단지: 단지의 실제 평형 라인업으로 정확히 변환
+ *    (예: 1차 전용 134㎡ → 49평, 2차 전용 113㎡ → 34평)
+ *  - 매칭 실패: 일반 시장 평형 매핑 fallback
+ *  - 작은 평형 (< 55㎡): 오피스텔·소형으로 보고 전용 평수 그대로
  *
- * 아파트는 매핑 테이블로 시장 평형(33·38·49·59·63·77)에 정렬,
- * 오피스텔처럼 작은 평형(전용 < 55㎡)은 전용 평수 그대로 표기합니다.
+ * 한국 부동산은 공급면적 기준 "X평형"이 일반 표기. 같은 매물도 전용 평수는
+ * 그보다 약 1.3배 작아서 시장 표기와 어긋나므로 항상 시장 표기로 변환합니다.
  */
-const APT_PYEONG_BREAKPOINTS: Array<[number, number]> = [
-  [65, 25], //  ~64㎡ → 25평
-  [75, 28], //  ~74㎡ → 28평
-  [90, 33], //  ~89㎡ → 33평  (전용 84㎡대 표준)
-  [105, 38], // ~104㎡ → 38평  (1차 38평형 = 전용 99㎡)
-  [120, 45], // ~119㎡ → 45평
-  [140, 49], // ~139㎡ → 49평  (1차 49평형 = 전용 134㎡)
-  [175, 59], // ~174㎡ → 59평  (1차 59평형 = 전용 165㎡)
-  [205, 63], // ~204㎡ → 63평
-  [Number.POSITIVE_INFINITY, 77], //   ≥205㎡ → 77평
+type SqmRange = readonly [maxExclusive: number, marketPyeong: number];
+
+const COMPLEX_SIZE_MAPPINGS: Partial<Record<ComplexId, readonly SqmRange[]>> = {
+  // 신영지웰시티 1차 — 38·49·59·63·77평 (전용 99·134·165·175·210㎡대)
+  "jiwell-1": [
+    [110, 38],
+    [140, 49],
+    [170, 59],
+    [185, 63],
+    [Number.POSITIVE_INFINITY, 77],
+  ],
+  // 두산위브지웰시티 2차 — 모든 세대 34평형 단일 (전용 112-113㎡대)
+  "jiwell-2": [[Number.POSITIVE_INFINITY, 34]],
+  // 청주 지웰시티 푸르지오 — 28·33평형 (전용 70㎡, 84㎡)
+  "jiwell-3": [
+    [78, 28],
+    [Number.POSITIVE_INFINITY, 33],
+  ],
+};
+
+const APT_PYEONG_BREAKPOINTS: readonly SqmRange[] = [
+  [65, 25],
+  [75, 28],
+  [90, 33],
+  [105, 38],
+  [120, 45],
+  [140, 49],
+  [175, 59],
+  [205, 63],
+  [Number.POSITIVE_INFINITY, 77],
 ];
 
-export function sqmToPyeong(sqm: number): number {
+export function sqmToPyeong(sqm: number, complexId?: ComplexId | null): number {
   if (!Number.isFinite(sqm) || sqm <= 0) return 0;
-  // 작은 평형(< 55㎡)은 오피스텔·소형으로 보고 전용 평수 그대로.
+
+  // 1) 매칭된 단지의 정확한 매핑이 있으면 우선 사용
+  if (complexId) {
+    const mapping = COMPLEX_SIZE_MAPPINGS[complexId];
+    if (mapping) {
+      for (const [max, pyeong] of mapping) {
+        if (sqm < max) return pyeong;
+      }
+    }
+  }
+
+  // 2) 작은 평형(< 55㎡)은 오피스텔·소형으로 보고 전용 평수 그대로
   if (sqm < 55) return Math.round(sqm / 3.3057);
-  // 아파트는 시장 통용 평형으로 매핑.
+
+  // 3) 일반 시장 평형 매핑 fallback
   for (const [max, pyeong] of APT_PYEONG_BREAKPOINTS) {
     if (sqm < max) return pyeong;
   }
@@ -257,15 +291,16 @@ async function fetchPage(
     const floorRaw = Number(it.floor ?? NaN);
     const buildYearRaw = Number(it.buildYear ?? NaN);
     const isRent = kind === "rent";
+    const complexId = matchComplexId(aptNm);
 
     return {
       kind,
       apartmentName: aptNm,
-      complexId: matchComplexId(aptNm),
+      complexId,
       dong: String(it.umdNm ?? "").trim(),
       jibun: String(it.jibun ?? "").trim(),
       exclusiveAreaSqm: sqm,
-      sizePyeong: sqmToPyeong(sqm),
+      sizePyeong: sqmToPyeong(sqm, complexId),
       dealDate: `${dealYear}-${pad2(dealMonth)}-${pad2(dealDay)}`,
       dealYearMonth: `${dealYear}-${pad2(dealMonth)}`,
       amountManwon: parseAmount(isRent ? it.deposit : it.dealAmount),

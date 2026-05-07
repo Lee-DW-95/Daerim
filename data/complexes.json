@@ -49,7 +49,7 @@
     "buildingCoverageRatio": 30,
     "parkingTotal": 3265,
     "parkingPerHousehold": 1.7,
-    "sizes": [33, 39, 49, 59],
+    "sizes": [34],
     "sizeStats": [],
     "schools": {
       "elementary": ["서촌초", "솔밭초"],
@@ -85,7 +85,7 @@
     "buildingCoverageRatio": null,
     "parkingTotal": 689,
     "parkingPerHousehold": 1.47,
-    "sizes": [],
+    "sizes": [28, 33],
     "sizeStats": [],
     "schools": {
       "elementary": ["서촌초", "솔밭초"],
