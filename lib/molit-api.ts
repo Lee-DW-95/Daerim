@@ -71,19 +71,25 @@ function normalizeAptName(name: string): string {
   return name.replace(/[\s\-_()·]/g, "").toLowerCase();
 }
 
-// 실제 국토부 데이터에서 관측되는 단지명 패턴 (정규화 후):
-//   - 아파트:
-//     - 신영지웰시티1차, 신영지웰 (약식 표기, 모두 1차로 간주)
-//     - 두산위브지웰시티2차
-//     - 청주지웰시티푸르지오 (3차)
-//   - 오피스텔:
-//     - 대농지구롯데캐슬시티 (lotte-officetel)
-// 3차 패턴은 1·2차와 겹치지 않도록 "푸르지오" 토큰을 반드시 포함.
+// 실제 국토부 데이터에서 관측되는 단지명 (정규화 후, 공백·하이픈 제거):
+//   - jiwell-1: "신영지웰시티1차" (정답).
+//     ⚠️ "신영지웰"(다른 단지·지번 3377)과 "청주테크노폴리스신영지웰푸르지오"
+//        (지번 213)는 별개. 18·26평 같은 1차에 없는 평형이 잘못 들어오므로
+//        ^...$ 로 정확히 잠근다.
+//   - jiwell-2: "두산위브지웰시티2차".
+//   - jiwell-3: "청주지웰시티푸르지오" 또는 "지웰시티푸르지오".
+//   - lotte-officetel: "대농지구롯데캐슬시티" (= "롯데캐슬시티"로 끝나는 형태).
 const COMPLEX_PATTERNS: Array<{ id: ComplexId; pattern: RegExp }> = [
-  { id: "jiwell-3", pattern: /지웰시티?푸르지오|푸르지오지웰시티/ },
-  { id: "jiwell-2", pattern: /두산위브지웰(시티)?(2차)?/ },
-  { id: "jiwell-1", pattern: /신영지웰(시티)?(1차)?/ },
-  { id: "lotte-officetel", pattern: /롯데캐슬시티|롯데캐슬오피스텔|롯데오피스텔/ },
+  {
+    id: "jiwell-3",
+    pattern: /^(청주)?지웰시티?푸르지오$|^푸르지오지웰시티$/,
+  },
+  { id: "jiwell-2", pattern: /^두산위브지웰시티(2차)?$/ },
+  { id: "jiwell-1", pattern: /^신영지웰시티(1차)?$/ },
+  {
+    id: "lotte-officetel",
+    pattern: /^(대농지구)?롯데캐슬시티$|^롯데캐슬오피스텔$|^롯데오피스텔$/,
+  },
 ];
 
 export function matchComplexId(aptNm: string): ComplexId | null {
