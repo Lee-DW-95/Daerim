@@ -14,13 +14,11 @@ type Props = {
 
 export function ComingSoon({ title, description, sprintLabel, eyebrow }: Props) {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col items-center px-4 py-20 text-center md:py-28">
-      {eyebrow && (
-        <p className="mb-3 text-xs font-medium uppercase tracking-widest text-primary">
-          {eyebrow}
-        </p>
-      )}
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
+    <div className="mx-auto flex max-w-3xl flex-col items-center px-4 py-24 text-center md:py-32">
+      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+      <h1 className="text-3xl font-bold leading-[1.1] tracking-tight md:text-5xl">
+        {title}
+      </h1>
       {description && (
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
           {description}

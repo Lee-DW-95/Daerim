@@ -36,18 +36,18 @@ export default async function BlogTagPage({
   if (posts.length === 0) notFound();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+    <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
       <Link
         href="/blog"
-        className="mb-6 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+        className="mb-8 inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="mr-1 h-4 w-4" />
         블로그 전체
       </Link>
 
-      <header className="mb-10 max-w-2xl space-y-2">
-        <p className="text-sm font-medium text-primary">TAG</p>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+      <header className="mb-12 max-w-2xl space-y-3">
+        <p className="eyebrow">TAG</p>
+        <h1 className="text-3xl font-bold leading-[1.1] tracking-tight md:text-4xl">
           #{tag}
         </h1>
         <p className="text-sm text-muted-foreground">{posts.length}개의 글</p>

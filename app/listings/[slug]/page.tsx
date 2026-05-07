@@ -104,29 +104,33 @@ export default async function ListingDetailPage({
       : formatManwon(listing.priceManwon, { unit: "auto" });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 md:px-6 md:py-14">
+    <div className="mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-20">
       <Link
         href="/listings"
-        className="mb-6 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+        className="mb-8 inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="mr-1 h-4 w-4" />
-        매물 목록으로
+        매물 목록
       </Link>
 
-      <header className="mb-8 space-y-3">
+      <header className="mb-10 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge>{DEAL_KIND_LABEL[listing.dealKind]}</Badge>
+          <Badge className="shadow-sm">
+            {DEAL_KIND_LABEL[listing.dealKind]}
+          </Badge>
           {listing.status !== "available" && (
-            <Badge variant="secondary">{STATUS_LABEL[listing.status]}</Badge>
+            <Badge variant="secondary" className="shadow-sm">
+              {STATUS_LABEL[listing.status]}
+            </Badge>
           )}
           <span className="text-sm font-medium text-muted-foreground">
             {complex?.name ?? "단지 정보 없음"}
           </span>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+        <h1 className="text-3xl font-bold leading-[1.15] tracking-tight md:text-5xl">
           {listing.headline}
         </h1>
-        <p className="text-3xl font-bold tabular-nums text-primary md:text-4xl">
+        <p className="text-3xl font-bold tracking-tight tabular-nums text-primary md:text-4xl">
           {priceLabel}
         </p>
       </header>
@@ -164,27 +168,32 @@ export default async function ListingDetailPage({
       </section>
 
       {/* Agent note */}
-      <section className="mb-10">
-        <Card className="border-primary/30 bg-primary/5">
-          <CardContent className="space-y-2 p-6">
-            <p className="text-xs font-medium uppercase tracking-widest text-primary">
-              운영자 코멘트
+      <section className="mb-12">
+        <Card className="overflow-hidden border-primary/30 bg-primary/5">
+          <CardContent className="space-y-3 p-7">
+            <p className="eyebrow">운영자 코멘트</p>
+            <p className="text-base leading-relaxed text-foreground/90 md:text-lg">
+              {listing.agentNote}
             </p>
-            <p className="text-base leading-relaxed">{listing.agentNote}</p>
-            <p className="text-xs text-muted-foreground">
-              {siteConfig.agent.name} {siteConfig.agent.role} ·{" "}
-              {siteConfig.agent.yearsOfExperience}년차
-            </p>
+            <div className="flex items-center gap-2 pt-1 text-xs text-muted-foreground">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                {siteConfig.agent.name.slice(0, 1)}
+              </span>
+              <span>
+                {siteConfig.agent.name} {siteConfig.agent.role} ·{" "}
+                {siteConfig.agent.yearsOfExperience}년차
+              </span>
+            </div>
           </CardContent>
         </Card>
       </section>
 
       {/* Pros / Cons */}
       {(listing.pros.length > 0 || listing.cons.length > 0) && (
-        <section className="mb-10 grid gap-4 md:grid-cols-2">
+        <section className="mb-12 grid gap-4 md:grid-cols-2">
           {listing.pros.length > 0 && (
-            <Card>
-              <CardContent className="space-y-2 p-5">
+            <Card className="card-lift">
+              <CardContent className="space-y-3 p-6">
                 <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-primary">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   강점
@@ -198,8 +207,8 @@ export default async function ListingDetailPage({
             </Card>
           )}
           {listing.cons.length > 0 && (
-            <Card>
-              <CardContent className="space-y-2 p-5">
+            <Card className="card-lift">
+              <CardContent className="space-y-3 p-6">
                 <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">
                   <AlertTriangle className="h-3.5 w-3.5" />
                   주의 / 약점

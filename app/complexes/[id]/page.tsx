@@ -218,28 +218,29 @@ export default async function ComplexDetailPage({
         );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-20">
       <Link
-        href="/tools/compare"
-        className="mb-6 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+        href="/complexes"
+        className="mb-8 inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="mr-1 h-4 w-4" />
-        전체 단지 비교로
+        단지 안내
       </Link>
 
-      <header className="mb-10 flex flex-col gap-3">
+      <header className="mb-12 flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge>{complex.type}</Badge>
+          <Badge className="shadow-sm">{complex.type}</Badge>
           {complex.buildYear && (
             <Badge variant="outline">{complex.buildYear}년 입주</Badge>
           )}
         </div>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+        <p className="eyebrow">{complex.shortName}</p>
+        <h1 className="text-3xl font-bold leading-[1.1] tracking-tight md:text-5xl">
           {complex.name}
         </h1>
         <p className="text-base text-muted-foreground">{complex.address}</p>
         {complex.tagline && (
-          <p className="text-sm leading-relaxed text-foreground/80 md:text-base">
+          <p className="max-w-3xl text-sm leading-relaxed text-foreground/80 md:text-base">
             {complex.tagline}
           </p>
         )}

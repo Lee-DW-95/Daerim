@@ -8,6 +8,7 @@ import {
   type AptDeal,
 } from "@/lib/molit-api";
 import { PriceHistoryTool } from "@/components/tools/price-history-tool";
+import { PageHeader } from "@/components/layout/page-header";
 
 import type { ComplexId } from "@/lib/types/complex";
 import type { PriceHistorySeries } from "@/components/tools/price-history-tool";
@@ -151,18 +152,12 @@ export default async function PriceHistoryPage() {
   const monthLabels = Array.from(iterateYearMonth(fromYm, toYm)).map(toLabel);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
-      <header className="mb-8 max-w-2xl space-y-2">
-        <p className="text-sm font-medium text-primary">TOOLS · PRICE HISTORY</p>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          시세 추이
-        </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-          청주 흥덕구 주요 단지의 최근 {MONTHS_OF_HISTORY}개월 매매·전세·월세
-          실거래 데이터를 단지·평형별로 보여드립니다. 지웰시티 1·2·3차(아파트)와
-          대농지구 롯데캐슬시티(오피스텔) 등 매칭된 단지가 모두 포함됩니다.
-        </p>
-      </header>
+    <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+      <PageHeader
+        eyebrow="TOOLS · PRICE HISTORY"
+        title="시세 추이"
+        description={`청주 흥덕구 주요 단지의 최근 ${MONTHS_OF_HISTORY}개월 매매·전세·월세 실거래 데이터를 단지·평형별로. 지웰시티 1·2·3차(아파트)와 대농지구 롯데캐슬시티(오피스텔) 등 매칭된 단지가 모두 포함됩니다.`}
+      />
 
       <PriceHistoryTool
         trade={tradeStats}

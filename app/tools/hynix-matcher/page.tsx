@@ -8,6 +8,7 @@ import {
 } from "@/lib/molit-api";
 import { complexes } from "@/lib/data/complexes";
 import { HynixMatcherTool } from "@/components/tools/hynix-matcher-tool";
+import { PageHeader } from "@/components/layout/page-header";
 
 import type { SizeMarketStat } from "@/lib/matcher";
 import type { ComplexId } from "@/lib/types/complex";
@@ -65,20 +66,12 @@ export default async function HynixMatcherPage() {
   const marketStats = aggregateMarketStats(tradeStats);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-16">
-      <header className="mb-10 max-w-2xl space-y-2">
-        <p className="text-sm font-medium text-primary">
-          TOOLS · HYNIX MATCHER ★
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          SK하이닉스 직원 매물 매칭
-        </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-          청주 발령으로 막막하시다면 5가지 조건만 알려주세요. 지웰시티 1·2·3차의
-          단지·평형 조합을 점수 순으로 정렬해 보여드립니다. 룰 기반 매칭이라
-          AI가 임의로 추천하는 게 아니에요.
-        </p>
-      </header>
+    <div className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
+      <PageHeader
+        eyebrow="TOOLS · HYNIX MATCHER ★"
+        title="SK하이닉스 직원 매물 매칭"
+        description="청주 발령으로 막막하시다면 5가지 조건만 알려주세요. 지웰시티 1·2·3차의 단지·평형 조합을 점수 순으로 정렬해 보여드립니다. 룰 기반 매칭이라 AI가 임의로 추천하는 게 아니에요."
+      />
 
       <HynixMatcherTool complexes={complexes} marketStats={marketStats} />
     </div>

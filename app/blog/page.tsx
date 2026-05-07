@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { getAllPosts, getUsedCategories } from "@/lib/mdx";
 import { PostCard } from "@/components/blog/post-card";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata: Metadata = {
   title: "블로그",
@@ -14,17 +15,12 @@ export default function BlogPage() {
   const categories = getUsedCategories();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
-      <header className="mb-10 max-w-2xl space-y-2">
-        <p className="text-sm font-medium text-primary">BLOG</p>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          청주 부동산 인사이트
-        </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-          단지 분석, 하이닉스 발령자 가이드, 학군 정리, 분기 시장 리포트.
-          데이터로 풀어내는 부동산 글입니다.
-        </p>
-      </header>
+    <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+      <PageHeader
+        eyebrow="BLOG"
+        title="청주 부동산 인사이트"
+        description="단지 분석, 하이닉스 발령자 가이드, 학군 정리, 분기 시장 리포트. 데이터로 풀어내는 부동산 글입니다."
+      />
 
       {categories.length > 0 && (
         <div className="mb-8 flex flex-wrap gap-2">

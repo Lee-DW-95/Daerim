@@ -4,6 +4,7 @@ import Link from "next/link";
 import { listListings } from "@/lib/data/listings";
 import { ListingsBrowser } from "@/components/listings/listings-browser";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata: Metadata = {
   title: "매물",
@@ -15,17 +16,12 @@ export default async function ListingsPage() {
   const listings = await listListings();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
-      <header className="mb-10 max-w-2xl space-y-2">
-        <p className="text-sm font-medium text-primary">LISTINGS</p>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          큐레이션 매물
-        </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-          매물 갯수가 아닌 깊이로 보여드립니다. 사이트에 올라오기 전 매물도
-          많으니, 원하시는 조건을 알려주시면 직접 안내드립니다.
-        </p>
-      </header>
+    <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+      <PageHeader
+        eyebrow="LISTINGS"
+        title="큐레이션 매물"
+        description="매물 갯수가 아닌 깊이로 보여드립니다. 사이트에 올라오기 전 매물도 많으니, 원하시는 조건을 알려주시면 직접 안내드립니다."
+      />
 
       {listings.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-10 text-center">

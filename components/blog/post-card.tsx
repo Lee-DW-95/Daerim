@@ -21,7 +21,7 @@ function formatDate(iso: string): string {
 export function PostCard({ post }: { post: PostSummary }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group block">
-      <Card className="h-full transition-colors group-hover:border-primary/40">
+      <Card className="card-lift h-full border-border/80">
         <CardContent className="space-y-3 p-6">
           <div className="flex items-center justify-between">
             <Badge variant="outline" className="border-primary/30 text-primary">

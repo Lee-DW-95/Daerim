@@ -5,6 +5,7 @@ import { ArrowRight, Building2, Calendar, Users } from "lucide-react";
 import { listComplexes } from "@/lib/data/complexes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata: Metadata = {
   title: "단지 안내",
@@ -16,17 +17,12 @@ export default function ComplexesIndexPage() {
   const complexes = listComplexes();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
-      <header className="mb-10 max-w-2xl space-y-2">
-        <p className="text-sm font-medium text-primary">COMPLEXES</p>
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          청주 지웰시티 단지 안내
-        </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-          단지별 핵심 정보, 평형별 시세 추이, 같은 단지 매물·관련 글까지 한
-          페이지에서 확인하실 수 있습니다.
-        </p>
-      </header>
+    <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+      <PageHeader
+        eyebrow="COMPLEXES"
+        title="청주 지웰시티 단지 안내"
+        description="단지별 핵심 정보, 평형별 시세 추이, 같은 단지 매물·관련 글까지 한 페이지에서 확인하실 수 있습니다."
+      />
 
       <div className="grid gap-5 md:grid-cols-3">
         {complexes.map((c) => (
@@ -35,8 +31,8 @@ export default function ComplexesIndexPage() {
               href={`/complexes/${c.id}`}
               className="group block"
             >
-              <Card className="h-full transition-colors group-hover:border-primary/40">
-                <CardContent className="space-y-4 p-6">
+              <Card className="card-lift h-full border-border/80">
+                <CardContent className="space-y-4 p-7">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge>{c.type}</Badge>
                     {c.buildYear && (

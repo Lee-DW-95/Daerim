@@ -15,13 +15,20 @@ export default async function AdminLoginPage({
   const { redirectTo } = await searchParams;
 
   return (
-    <div className="mx-auto flex min-h-[60vh] max-w-md items-center px-4 py-12 md:py-16">
-      <div className="w-full">
-        <h1 className="mb-2 text-2xl font-bold tracking-tight">어드민 로그인</h1>
-        <p className="mb-6 text-sm text-muted-foreground">
-          운영자 전용 페이지입니다. 등록된 이메일로만 접근 가능합니다.
-        </p>
-        <LoginForm redirectTo={redirectTo ?? "/admin"} />
+    <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-12 md:py-20">
+      <div className="w-full space-y-6">
+        <div className="space-y-2">
+          <p className="eyebrow">ADMIN</p>
+          <h1 className="text-3xl font-bold leading-[1.1] tracking-tight">
+            어드민 로그인
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            운영자 전용 페이지입니다. 등록된 이메일로만 접근 가능합니다.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <LoginForm redirectTo={redirectTo ?? "/admin"} />
+        </div>
       </div>
     </div>
   );
