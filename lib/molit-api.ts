@@ -100,9 +100,37 @@ export function matchComplexId(aptNm: string): ComplexId | null {
   return null;
 }
 
-/** 전용면적(㎡) → 한국식 평수(반올림). 1평 ≈ 3.3057㎡. */
+/**
+ * 전용면적(㎡) → 한국 부동산 시장에서 통용되는 평형(반올림).
+ *
+ * 한국 부동산은 보통 "공급면적 평수"로 평형을 표기합니다 (예: 33평형, 49평형).
+ * 같은 매물도 전용면적 평수는 33평형 → 25.7평, 49평형 → 34.4평 등으로
+ * 약 1.3배 차이가 나서 그대로 표시하면 시장 표기와 어긋납니다.
+ *
+ * 아파트는 매핑 테이블로 시장 평형(33·38·49·59·63·77)에 정렬,
+ * 오피스텔처럼 작은 평형(전용 < 55㎡)은 전용 평수 그대로 표기합니다.
+ */
+const APT_PYEONG_BREAKPOINTS: Array<[number, number]> = [
+  [65, 25], //  ~64㎡ → 25평
+  [75, 28], //  ~74㎡ → 28평
+  [90, 33], //  ~89㎡ → 33평  (전용 84㎡대 표준)
+  [105, 38], // ~104㎡ → 38평  (1차 38평형 = 전용 99㎡)
+  [120, 45], // ~119㎡ → 45평
+  [140, 49], // ~139㎡ → 49평  (1차 49평형 = 전용 134㎡)
+  [175, 59], // ~174㎡ → 59평  (1차 59평형 = 전용 165㎡)
+  [205, 63], // ~204㎡ → 63평
+  [Number.POSITIVE_INFINITY, 77], //   ≥205㎡ → 77평
+];
+
 export function sqmToPyeong(sqm: number): number {
-  return Math.round(sqm / 3.3057);
+  if (!Number.isFinite(sqm) || sqm <= 0) return 0;
+  // 작은 평형(< 55㎡)은 오피스텔·소형으로 보고 전용 평수 그대로.
+  if (sqm < 55) return Math.round(sqm / 3.3057);
+  // 아파트는 시장 통용 평형으로 매핑.
+  for (const [max, pyeong] of APT_PYEONG_BREAKPOINTS) {
+    if (sqm < max) return pyeong;
+  }
+  return 77;
 }
 
 /** 거래금액 문자열 ("16,700") → 숫자 (만원). */
