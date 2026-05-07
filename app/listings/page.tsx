@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     "청주 지웰시티 1·2·3차 + 롯데 오피스텔 큐레이션 매물. 단지·거래유형·평형으로 필터링하세요.",
 };
 
-export default function ListingsPage() {
-  const listings = listListings();
+export default async function ListingsPage() {
+  const listings = await listListings();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">

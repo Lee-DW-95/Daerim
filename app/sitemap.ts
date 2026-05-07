@@ -6,7 +6,7 @@ import { listComplexes } from "@/lib/data/complexes";
 import { getAllPosts, getUsedCategories, getUsedTags } from "@/lib/mdx";
 import { toolsNav } from "@/lib/site-config";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");
   const now = new Date();
 
@@ -45,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  for (const listing of listListings()) {
+  for (const listing of await listListings()) {
     items.push({
       url: `${base}/listings/${listing.slug}`,
       lastModified: new Date(listing.publishedAt),

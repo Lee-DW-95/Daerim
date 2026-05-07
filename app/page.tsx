@@ -21,9 +21,9 @@ const heroToolIcons: Record<string, React.ComponentType<{ className?: string }>>
   "/tools/hynix-matcher": Cpu,
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   const featuredTools = toolsNav.filter((tool) => tool.href in heroToolIcons);
-  const featuredListings = listListings().slice(0, 3);
+  const featuredListings = (await listListings()).slice(0, 3);
 
   return (
     <div className="flex flex-col">

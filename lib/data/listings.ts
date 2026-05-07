@@ -1,19 +1,77 @@
-import listingsJson from "@/data/listings.json";
+import "server-only";
 
+import {
+  createSupabaseServerClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/server";
+import type { ListingRow } from "@/lib/supabase/types";
 import type { Listing } from "@/lib/types/listing";
 
-export const listings = listingsJson as Listing[];
+import legacyListingsJson from "@/data/listings.json";
 
-export function listListings(): Listing[] {
-  return [...listings].sort((a, b) =>
-    b.publishedAt.localeCompare(a.publishedAt)
-  );
+const legacyListings = legacyListingsJson as Listing[];
+
+/**
+ * Supabase row → 도메인 모델(Listing) 변환.
+ * snake_case ↔ camelCase 매핑을 한 곳에 모아둡니다.
+ */
+function rowToListing(row: ListingRow): Listing {
+  return {
+    slug: row.slug,
+    complexId: row.complex_id as Listing["complexId"],
+    dealKind: row.deal_kind,
+    sizePyeong: row.size_pyeong,
+    exclusiveAreaSqm: row.exclusive_area_sqm ?? undefined,
+    currentFloor: row.current_floor,
+    totalFloor: row.total_floor ?? undefined,
+    direction: row.direction,
+    priceManwon: row.price_manwon,
+    monthlyRentManwon: row.monthly_rent_manwon ?? undefined,
+    availableFrom: row.available_from,
+    status: row.status,
+    publishedAt: row.published_at,
+    headline: row.headline,
+    agentNote: row.agent_note,
+    pros: row.pros ?? [],
+    cons: row.cons ?? [],
+    features: row.features ?? [],
+    images: row.images ?? [],
+  };
 }
 
-export function getListing(slug: string): Listing | undefined {
-  return listings.find((l) => l.slug === slug);
+async function fetchListings(): Promise<Listing[]> {
+  // Supabase 미구성 시 JSON 시드를 fallback으로 사용 (개발 초기 단계 or 빌드 환경).
+  if (!isSupabaseConfigured()) {
+    return [...legacyListings];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("listings")
+    .select("*")
+    .order("published_at", { ascending: false });
+
+  if (error) {
+    console.warn(
+      "[listings] Supabase fetch 실패 — JSON fallback:",
+      error.message
+    );
+    return [...legacyListings];
+  }
+
+  return (data ?? []).map(rowToListing);
 }
 
-export function listListingSlugs(): string[] {
-  return listings.map((l) => l.slug);
+export async function listListings(): Promise<Listing[]> {
+  return fetchListings();
+}
+
+export async function getListing(slug: string): Promise<Listing | undefined> {
+  const all = await fetchListings();
+  return all.find((l) => l.slug === slug);
+}
+
+export async function listListingSlugs(): Promise<string[]> {
+  const all = await fetchListings();
+  return all.map((l) => l.slug);
 }

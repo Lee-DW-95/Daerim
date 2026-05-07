@@ -13,6 +13,11 @@ export const serverEnv = {
   molitPartApiKey: process.env.MOLIT_PART_API_KEY,
   /** 국토교통부 오피스텔 매매·전월세 OpenAPI 키. */
   molitOfficeApiKey: process.env.MOLIT_OFFICE_API_KEY,
+  /**
+   * Supabase service role 키. RLS를 우회하므로 절대 클라이언트에 노출 금지.
+   * 일반적인 매물 fetch는 anon 키만으로 충분합니다.
+   */
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
 } as const;
 
 export const publicEnv = {
@@ -24,6 +29,10 @@ export const publicEnv = {
   naverVerification: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION,
   /** 구글 서치 콘솔 사이트 인증 토큰. */
   googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  /** Supabase 프로젝트 URL. https://<project>.supabase.co */
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  /** Supabase anon (public) key. RLS 정책으로 보호됨. */
+  supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 } as const;
 
 export function requireServerEnv<K extends keyof typeof serverEnv>(

@@ -120,7 +120,7 @@ export default async function ComplexDetailPage({
   );
 
   // 같은 단지 매물·관련 글
-  const relatedListings = listListings().filter(
+  const relatedListings = (await listListings()).filter(
     (l) => l.complexId === complex.id
   );
   const relatedPosts = getAllPosts().filter((p) =>

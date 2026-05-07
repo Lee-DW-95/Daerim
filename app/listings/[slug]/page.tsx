@@ -37,8 +37,8 @@ export const revalidate = 86400;
 
 type Params = { slug: string };
 
-export function generateStaticParams() {
-  return listListings().map((l) => ({ slug: l.slug }));
+export async function generateStaticParams() {
+  return (await listListings()).map((l) => ({ slug: l.slug }));
 }
 
 export async function generateMetadata({
@@ -47,7 +47,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const listing = getListing(slug);
+  const listing = await getListing(slug);
   if (!listing) return { title: "매물을 찾을 수 없습니다" };
   const complex = getComplex(listing.complexId);
   return {
@@ -62,7 +62,7 @@ export default async function ListingDetailPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const listing = getListing(slug);
+  const listing = await getListing(slug);
   if (!listing) notFound();
 
   const complex = getComplex(listing.complexId);
