@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Building2, ArrowLeft } from "lucide-react";
+import {
+  LogOut,
+  LayoutDashboard,
+  Building2,
+  ArrowLeft,
+  Inbox,
+} from "lucide-react";
 
 import {
   createSupabaseServerClient,
@@ -69,6 +75,13 @@ export default async function AdminLayout({
               >
                 <Building2 className="h-3.5 w-3.5" />
                 매물 관리
+              </Link>
+              <Link
+                href="/admin/contacts"
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              >
+                <Inbox className="h-3.5 w-3.5" />
+                문의 관리
               </Link>
             </nav>
           )}

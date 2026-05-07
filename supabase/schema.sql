@@ -69,7 +69,62 @@ create policy "Authenticated manage listings"
   using (true)
   with check (true);
 
--- 3) Storage 버킷 (매물 사진) -----------------------------------------------
+-- 3) 문의 테이블 (contacts) -------------------------------------------------
+create table if not exists public.contacts (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  phone text not null,
+  email text,
+  interested_complex_id text,
+  deal_kind text check (
+    deal_kind is null
+    or deal_kind in ('trade', 'jeonse', 'monthly')
+  ),
+  size_pyeong int,
+  budget_manwon int,
+  message text not null,
+  status text not null default 'new'
+    check (status in ('new', 'read', 'replied', 'archived')),
+  agreed_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  replied_at timestamptz,
+  notes text
+);
+
+create index if not exists idx_contacts_created_at on public.contacts (created_at desc);
+create index if not exists idx_contacts_status     on public.contacts (status);
+
+-- RLS
+alter table public.contacts enable row level security;
+
+-- 익명(anon) 사용자도 폼 submit으로 INSERT 가능. 그러나 SELECT/UPDATE/DELETE는 X.
+drop policy if exists "Anyone can submit contact" on public.contacts;
+create policy "Anyone can submit contact"
+  on public.contacts for insert
+  to anon, authenticated
+  with check (true);
+
+-- 운영자(인증)만 조회·수정·삭제 가능.
+drop policy if exists "Authenticated read contacts" on public.contacts;
+create policy "Authenticated read contacts"
+  on public.contacts for select
+  to authenticated
+  using (true);
+
+drop policy if exists "Authenticated update contacts" on public.contacts;
+create policy "Authenticated update contacts"
+  on public.contacts for update
+  to authenticated
+  using (true)
+  with check (true);
+
+drop policy if exists "Authenticated delete contacts" on public.contacts;
+create policy "Authenticated delete contacts"
+  on public.contacts for delete
+  to authenticated
+  using (true);
+
+-- 4) Storage 버킷 (매물 사진) -----------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('listing-images', 'listing-images', true)
 on conflict (id) do nothing;

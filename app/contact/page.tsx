@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { KakaoMap } from "@/components/kakao-map";
 import { PageHeader } from "@/components/layout/page-header";
+import { ContactForm } from "@/components/contact/contact-form";
 
 export const metadata: Metadata = {
   title: "문의",
@@ -107,17 +108,14 @@ export default function ContactPage() {
 
       <section className="mb-12">
         <p className="eyebrow mb-3">FORM</p>
-        <h2 className="mb-6 text-2xl font-bold tracking-tight md:text-3xl">
+        <h2 className="mb-2 text-2xl font-bold tracking-tight md:text-3xl">
           문의 폼
         </h2>
-        <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-12 text-center">
-          <p className="text-sm text-muted-foreground">
-            Tally 폼 임베드 자리 (Sprint 1 후반부에 폼 ID 받아 연결).
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground/80">
-            그 전까지는 전화 또는 카카오톡으로 문의 부탁드립니다.
-          </p>
-        </div>
+        <p className="mb-6 text-sm text-muted-foreground">
+          입력하신 내용은 바로 운영자에게 전달됩니다. 기본 정보(이름·연락처·
+          문의 내용)만 필수, 나머지는 선택입니다.
+        </p>
+        <ContactForm />
       </section>
 
       <section>

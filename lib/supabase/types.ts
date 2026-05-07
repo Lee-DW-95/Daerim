@@ -45,6 +45,37 @@ export type ListingInsert = Omit<
 
 export type ListingUpdate = Partial<ListingInsert>;
 
+export type ContactStatus = "new" | "read" | "replied" | "archived";
+export type ContactDealKind = "trade" | "jeonse" | "monthly";
+
+export type ContactRow = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  interested_complex_id: string | null;
+  deal_kind: ContactDealKind | null;
+  size_pyeong: number | null;
+  budget_manwon: number | null;
+  message: string;
+  status: ContactStatus;
+  agreed_at: string;
+  created_at: string;
+  replied_at: string | null;
+  notes: string | null;
+};
+
+export type ContactInsert = Omit<
+  ContactRow,
+  "id" | "agreed_at" | "created_at" | "replied_at" | "notes" | "status"
+> & {
+  status?: ContactStatus;
+};
+
+export type ContactUpdate = Partial<
+  Omit<ContactRow, "id" | "created_at" | "agreed_at">
+>;
+
 export type Database = {
   public: {
     Tables: {
@@ -52,6 +83,12 @@ export type Database = {
         Row: ListingRow;
         Insert: ListingInsert;
         Update: ListingUpdate;
+        Relationships: [];
+      };
+      contacts: {
+        Row: ContactRow;
+        Insert: ContactInsert;
+        Update: ContactUpdate;
         Relationships: [];
       };
     };
