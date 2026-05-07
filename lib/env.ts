@@ -1,38 +1,55 @@
 /**
  * 환경변수 typed accessor.
  *
- * - 서버 전용 키(MOLIT_API_KEY)는 클라이언트 번들에 노출되지 않습니다.
+ * - 서버 전용 키(MOLIT_API_KEY 등)는 클라이언트 번들에 노출되지 않습니다.
  * - 클라이언트 키(NEXT_PUBLIC_*)는 Next.js가 빌드 타임에 인라인합니다.
- * - 키가 없을 때 사용 시점에 빠르게 실패하도록 helper를 제공합니다.
+ * - 환경변수 입력 시 흔한 실수(앞뒤 공백·개행·따옴표·protocol 누락)를
+ *   방어적으로 sanitize 합니다. Vercel 입력란에서 보이지 않게 들어간
+ *   문자가 fetch invalid value 에러를 유발하는 문제 방지.
  */
+
+/** 앞뒤 공백·개행·따옴표 제거. 빈 문자열은 undefined로. */
+function clean(v: string | undefined): string | undefined {
+  if (v == null) return undefined;
+  const trimmed = v.trim().replace(/^["']|["']$/g, "").trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+/** URL 형식 보정 — protocol 누락 시 https:// 자동 추가. */
+function cleanUrl(v: string | undefined): string | undefined {
+  const cleaned = clean(v);
+  if (!cleaned) return undefined;
+  if (!/^https?:\/\//.test(cleaned)) return `https://${cleaned}`;
+  return cleaned;
+}
 
 export const serverEnv = {
   /** 국토교통부 아파트 매매 OpenAPI Decoding 키. */
-  molitApiKey: process.env.MOLIT_API_KEY,
+  molitApiKey: clean(process.env.MOLIT_API_KEY),
   /** 국토교통부 아파트 전월세 OpenAPI 키 (별도 사용신청 필요). */
-  molitPartApiKey: process.env.MOLIT_PART_API_KEY,
+  molitPartApiKey: clean(process.env.MOLIT_PART_API_KEY),
   /** 국토교통부 오피스텔 매매·전월세 OpenAPI 키. */
-  molitOfficeApiKey: process.env.MOLIT_OFFICE_API_KEY,
+  molitOfficeApiKey: clean(process.env.MOLIT_OFFICE_API_KEY),
   /**
    * Supabase service role 키. RLS를 우회하므로 절대 클라이언트에 노출 금지.
    * 일반적인 매물 fetch는 anon 키만으로 충분합니다.
    */
-  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  supabaseServiceRoleKey: clean(process.env.SUPABASE_SERVICE_ROLE_KEY),
 } as const;
 
 export const publicEnv = {
   /** 카카오 지도 JavaScript API 키. 도메인 화이트리스트 필수. */
-  kakaoMapKey: process.env.NEXT_PUBLIC_KAKAO_MAP_KEY,
+  kakaoMapKey: clean(process.env.NEXT_PUBLIC_KAKAO_MAP_KEY),
   /** Google Analytics 4 측정 ID. 비어있으면 GA 미동작. 예: "G-XXXXXXXXXX". */
-  gaId: process.env.NEXT_PUBLIC_GA_ID,
+  gaId: clean(process.env.NEXT_PUBLIC_GA_ID),
   /** 네이버 서치어드바이저 사이트 인증 토큰. */
-  naverVerification: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION,
+  naverVerification: clean(process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION),
   /** 구글 서치 콘솔 사이트 인증 토큰. */
-  googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  googleVerification: clean(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION),
   /** Supabase 프로젝트 URL. https://<project>.supabase.co */
-  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseUrl: cleanUrl(process.env.NEXT_PUBLIC_SUPABASE_URL),
   /** Supabase anon (public) key. RLS 정책으로 보호됨. */
-  supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  supabaseAnonKey: clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
 } as const;
 
 export function requireServerEnv<K extends keyof typeof serverEnv>(
