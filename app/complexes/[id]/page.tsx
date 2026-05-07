@@ -14,12 +14,11 @@ import {
 } from "lucide-react";
 
 import {
-  fetchAptTradesRange,
-  groupByComplexSizeMonth,
+  fetchDealsRange,
   recentMonths,
   iterateYearMonth,
   LAWD_CD,
-  type DealGroupStat,
+  type AptDeal,
 } from "@/lib/molit-api";
 import { complexes, getComplex } from "@/lib/data/complexes";
 import { listListings } from "@/lib/data/listings";
@@ -73,17 +72,63 @@ export async function generateMetadata({
 
 const MONTHS_OF_HISTORY = 36;
 
-function toSeries(stats: DealGroupStat[]): PriceHistorySeries[] {
-  return stats.map((s) => ({
-    complexId: s.complexId,
-    sizePyeong: s.sizePyeong,
-    yearMonth: `${s.yearMonth.slice(0, 4)}-${s.yearMonth.slice(4, 6)}`,
-    count: s.count,
-    avgManwon: s.avgManwon,
-    medianManwon: s.medianManwon,
-    minManwon: s.minManwon,
-    maxManwon: s.maxManwon,
-  }));
+type Bucket = {
+  sizePyeong: number;
+  yearMonth: string;
+  prices: number[];
+  monthlyRents: number[];
+};
+
+function aggregate(
+  deals: AptDeal[],
+  filter: (d: AptDeal) => boolean,
+  complexIdFilter: ComplexId
+): PriceHistorySeries[] {
+  const buckets = new Map<string, Bucket>();
+  for (const d of deals) {
+    if (d.complexId !== complexIdFilter) continue;
+    if (!filter(d)) continue;
+    if (d.amountManwon <= 0) continue;
+    const key = `${d.sizePyeong}|${d.dealYearMonth}`;
+    const cur = buckets.get(key) ?? {
+      sizePyeong: d.sizePyeong,
+      yearMonth: d.dealYearMonth,
+      prices: [],
+      monthlyRents: [],
+    };
+    cur.prices.push(d.amountManwon);
+    if (d.monthlyRentManwon > 0) cur.monthlyRents.push(d.monthlyRentManwon);
+    buckets.set(key, cur);
+  }
+  const out: PriceHistorySeries[] = [];
+  for (const b of buckets.values()) {
+    const sorted = [...b.prices].sort((a, b) => a - b);
+    const sum = sorted.reduce((s, n) => s + n, 0);
+    const median =
+      sorted.length % 2 === 0
+        ? Math.round((sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2)
+        : sorted[(sorted.length - 1) / 2];
+    out.push({
+      complexId: complexIdFilter,
+      sizePyeong: b.sizePyeong,
+      yearMonth: b.yearMonth,
+      count: sorted.length,
+      avgManwon: Math.round(sum / sorted.length),
+      medianManwon: median,
+      minManwon: sorted[0],
+      maxManwon: sorted[sorted.length - 1],
+      avgMonthlyRent:
+        b.monthlyRents.length === 0
+          ? undefined
+          : Math.round(
+              b.monthlyRents.reduce((s, n) => s + n, 0) / b.monthlyRents.length
+            ),
+    });
+  }
+  return out.sort(
+    (a, b) =>
+      a.sizePyeong - b.sizePyeong || a.yearMonth.localeCompare(b.yearMonth)
+  );
 }
 
 function fmt(n: number | null | undefined, suffix = ""): string {
@@ -104,15 +149,47 @@ export default async function ComplexDetailPage({
   const fromYm = months[0];
   const toYm = months[months.length - 1];
 
-  const tradeRaw = await fetchAptTradesRange({
-    lawdCd: LAWD_CD.cheongjuHeungdeok,
-    fromYm,
-    toYm,
-    kind: "trade",
-  });
+  // 4종 데이터를 모두 fetch — 단지에 따라 어떤 게 의미있는지 다름
+  const [aptTrade, aptRent, offiTrade, offiRent] = await Promise.all([
+    fetchDealsRange({
+      lawdCd: LAWD_CD.cheongjuHeungdeok,
+      fromYm,
+      toYm,
+      target: "apt-trade",
+    }),
+    fetchDealsRange({
+      lawdCd: LAWD_CD.cheongjuHeungdeok,
+      fromYm,
+      toYm,
+      target: "apt-rent",
+    }).catch(() => [] as AptDeal[]),
+    fetchDealsRange({
+      lawdCd: LAWD_CD.cheongjuHeungdeok,
+      fromYm,
+      toYm,
+      target: "offi-trade",
+    }).catch(() => [] as AptDeal[]),
+    fetchDealsRange({
+      lawdCd: LAWD_CD.cheongjuHeungdeok,
+      fromYm,
+      toYm,
+      target: "offi-rent",
+    }).catch(() => [] as AptDeal[]),
+  ]);
 
-  const stats = groupByComplexSizeMonth(
-    tradeRaw.filter((d) => d.complexId === complex.id)
+  const allTrade = [...aptTrade, ...offiTrade];
+  const allRent = [...aptRent, ...offiRent];
+
+  const tradeStats = aggregate(allTrade, () => true, complex.id);
+  const jeonseStats = aggregate(
+    allRent,
+    (d) => d.monthlyRentManwon === 0,
+    complex.id
+  );
+  const monthlyStats = aggregate(
+    allRent,
+    (d) => d.monthlyRentManwon > 0,
+    complex.id
   );
 
   const monthLabels = Array.from(iterateYearMonth(fromYm, toYm)).map(
@@ -127,13 +204,17 @@ export default async function ComplexDetailPage({
     p.tags?.some((t) => t.includes(complex.shortName) || t === "지웰시티")
   );
 
-  // 평균 매매가 (전체 평형 통합)
-  const totalCount = stats.reduce((s, x) => s + x.count, 0);
+  // 핵심 지표용 평균 (매매가 있으면 매매, 없으면 전세를 대표값으로)
+  const summaryStats = tradeStats.length > 0 ? tradeStats : jeonseStats;
+  const summaryLabel =
+    tradeStats.length > 0 ? "평균 매매가" : "평균 전세 보증금";
+  const totalCount = summaryStats.reduce((s, x) => s + x.count, 0);
   const overallAvg =
     totalCount === 0
       ? null
       : Math.round(
-          stats.reduce((s, x) => s + x.avgManwon * x.count, 0) / totalCount
+          summaryStats.reduce((s, x) => s + x.avgManwon * x.count, 0) /
+            totalCount
         );
 
   return (
@@ -202,25 +283,29 @@ export default async function ComplexDetailPage({
           <div>
             <p className="text-sm font-medium text-primary">PRICE TREND</p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
-              평형별 매매가 추이
+              평형별 시세 추이
             </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              매매·전세·월세 거래 종류를 토글해서 비교하세요. 데이터 없는 종류는
+              비활성화됩니다.
+            </p>
           </div>
           {overallAvg != null && (
             <Badge variant="outline" className="tabular-nums">
-              전체 평균 {overallAvg.toLocaleString("ko-KR")}만원
+              {summaryLabel} {overallAvg.toLocaleString("ko-KR")}만원
             </Badge>
           )}
         </div>
         <ComplexPriceTrend
           complexId={complex.id}
-          trade={toSeries(stats)}
+          trade={tradeStats}
+          jeonse={jeonseStats}
+          monthly={monthlyStats}
           monthLabels={monthLabels}
         />
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link href={`/tools/price-history?complex=${complex.id}`}>
-              실거래가 추이 도구로 →
-            </Link>
+            <Link href={`/tools/price-history`}>전체 단지 시세 추이 →</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link href="/tools/compare">다른 단지와 비교 →</Link>

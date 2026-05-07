@@ -57,6 +57,8 @@ export type Recommendation = {
   estimatedPriceManwon: number | null;
   /** 거래 건수 (신뢰도). */
   sampleCount: number;
+  /** 예산 대비 초과 비율. 0=예산 내, 0.15=15% 초과 등. */
+  budgetOverRatio: number;
 };
 
 const FAMILY_PYEONG_FIT: Record<Family, [number, number]> = {
@@ -114,11 +116,14 @@ function overlapScore(
 function inBudget(price: number | null, budget: number): {
   fit: number;
   message: string;
+  /** 예산 대비 초과 비율. 0 이하면 예산 내. */
+  overRatio: number;
 } {
   if (price == null) {
     return {
       fit: 0.5,
       message: "시세 데이터 부족 — 운영자 직접 확인 권장",
+      overRatio: 0,
     };
   }
   if (price <= budget) {
@@ -129,6 +134,7 @@ function inBudget(price: number | null, budget: number): {
         headroom > 0.2
           ? `예산 여유 ${Math.round(headroom * 100)}% — 평형 상향도 검토 가능`
           : "예산 내 가능",
+      overRatio: 0,
     };
   }
   const over = (price - budget) / budget;
@@ -136,11 +142,13 @@ function inBudget(price: number | null, budget: number): {
     return {
       fit: 0.6,
       message: `예산 ${Math.round(over * 100)}% 초과 — 협상·층수 조정으로 가능성 있음`,
+      overRatio: over,
     };
   }
   return {
     fit: 0.1,
     message: `예산 ${Math.round(over * 100)}% 초과 — 평형 하향 검토 필요`,
+    overRatio: over,
   };
 }
 
@@ -353,11 +361,30 @@ export function rankRecommendations(params: {
         cautions,
         estimatedPriceManwon: estimatedPrice,
         sampleCount: saleCount,
+        budgetOverRatio: budget.overRatio,
       });
     }
   }
 
   return recs.sort((a, b) => b.score - a.score);
+}
+
+/**
+ * rankRecommendations 결과를 사용자에게 보여줄 때 적용할 필터.
+ *
+ * - 예산을 30% 이상 초과한 추천은 명백히 가용 범위 밖이므로 제외.
+ * - 점수 40 미만은 평형 적합도·우선순위 매칭이 너무 낮아 노이즈로 간주.
+ * - 결과 갯수는 입력 조건에 따라 자연스럽게 달라짐 (고정 N개 X).
+ */
+export function pickRecommendations(
+  all: Recommendation[],
+  options: { maxOverRatio?: number; minScore?: number; limit?: number } = {}
+): Recommendation[] {
+  const { maxOverRatio = 0.3, minScore = 40, limit = 12 } = options;
+  return all
+    .filter((r) => r.budgetOverRatio <= maxOverRatio)
+    .filter((r) => r.score >= minScore)
+    .slice(0, limit);
 }
 
 export const MATCHER_LABELS = {

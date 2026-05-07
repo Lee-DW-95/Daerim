@@ -45,6 +45,12 @@ export function RentVsBuyChart({ data }: Props) {
               formatManwon(v, { unit: "auto", decimals: 1 })
             }
             width={70}
+            label={{
+              value: "순자산(만원)",
+              angle: -90,
+              position: "insideLeft",
+              style: { fontSize: 11, fill: "var(--muted-foreground)" },
+            }}
           />
           <Tooltip
             contentStyle={{

@@ -13,6 +13,7 @@ import { siteConfig } from "@/lib/site-config";
 import {
   MATCHER_LABELS,
   rankRecommendations,
+  pickRecommendations,
   type DealKind,
   type Family,
   type MatcherInput,
@@ -78,11 +79,12 @@ export function HynixMatcherTool({ complexes, marketStats }: Props) {
       budgetManwon: budget,
       priorities: [...priorities],
     };
-    return rankRecommendations({
+    const all = rankRecommendations({
       input,
       complexes,
       marketStats,
-    }).slice(0, 6);
+    });
+    return pickRecommendations(all, { maxOverRatio: 0.3, minScore: 40 });
   }, [submitted, rank, family, dealKind, budget, priorities, complexes, marketStats]);
 
   return (
@@ -221,7 +223,11 @@ function ResultsSection({
   if (recommendations.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-10 text-center text-sm text-muted-foreground">
-        조건에 맞는 추천을 찾지 못했습니다. 예산을 조정해보세요.
+        <p>조건에 맞는 추천을 찾지 못했습니다.</p>
+        <p className="mt-1 text-xs">
+          예산을 조금 늘리거나, 우선순위 또는 평형 범위를 조정해보세요.
+          예산을 30% 이상 초과하는 추천은 자동으로 제외됩니다.
+        </p>
       </div>
     );
   }
@@ -240,12 +246,12 @@ function ResultsSection({
           </h2>
         </div>
         <p className="text-xs text-muted-foreground">
-          점수는 평형 적합도(35%) + 예산 적합도(30%) + 우선순위 매칭(35%)의
-          가중 평균입니다.
+          예산 30% 초과 / 점수 40점 미만 추천은 자동 제외. 점수 = 평형
+          적합도(35%) + 예산 적합도(30%) + 우선순위 매칭(35%).
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {recommendations.map((r, i) => (
           <Card
             key={`${r.complexId}-${r.sizePyeong}`}

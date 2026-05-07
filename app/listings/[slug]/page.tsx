@@ -131,44 +131,12 @@ export default async function ListingDetailPage({
         </p>
       </header>
 
-      {/* Gallery */}
+      {/* Gallery — 사진 갯수에 따라 동적 레이아웃 */}
       <section className="mb-10">
-        <div className="grid gap-2 md:grid-cols-3">
-          <div className="relative col-span-2 aspect-[4/3] overflow-hidden rounded-xl border border-border bg-secondary">
-            {listing.images[0] ? (
-              <img
-                src={listing.images[0]}
-                alt={listing.headline}
-                loading="eager"
-                decoding="async"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center text-muted-foreground">
-                <Building2 className="h-12 w-12 opacity-50" />
-                <p className="mt-2 text-sm">사진은 곧 업데이트됩니다</p>
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
-            {[1, 2].map((idx) => (
-              <div
-                key={idx}
-                className="aspect-[4/3] overflow-hidden rounded-xl border border-border bg-secondary"
-              >
-                {listing.images[idx] ? (
-                  <img
-                    src={listing.images[idx]}
-                    alt={`${listing.headline} ${idx}`}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover"
-                  />
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </div>
+        <ListingGallery
+          headline={listing.headline}
+          images={listing.images}
+        />
       </section>
 
       {/* Core info */}
@@ -419,6 +387,76 @@ export default async function ListingDetailPage({
           </Button>
         </div>
       </section>
+    </div>
+  );
+}
+
+function ListingGallery({
+  headline,
+  images,
+}: {
+  headline: string;
+  images: string[];
+}) {
+  if (images.length === 0) {
+    return (
+      <div className="flex aspect-[16/9] w-full flex-col items-center justify-center rounded-xl border border-border bg-secondary text-muted-foreground">
+        <Building2 className="h-12 w-12 opacity-50" />
+        <p className="mt-2 text-sm">사진은 곧 업데이트됩니다</p>
+      </div>
+    );
+  }
+
+  if (images.length === 1) {
+    return (
+      <div className="aspect-[16/9] w-full overflow-hidden rounded-xl border border-border bg-secondary">
+        <img
+          src={images[0]}
+          alt={headline}
+          loading="eager"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  // 2장 이상이면 큰 사진 + 우측 작은 사진(들)
+  const secondaryCount = Math.min(images.length - 1, 2);
+
+  return (
+    <div className="grid gap-2 md:grid-cols-3">
+      <div className="relative col-span-2 aspect-[4/3] overflow-hidden rounded-xl border border-border bg-secondary">
+        <img
+          src={images[0]}
+          alt={headline}
+          loading="eager"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+      </div>
+      <div
+        className={`grid gap-2 ${
+          secondaryCount === 1
+            ? "grid-cols-1"
+            : "grid-cols-2 md:grid-cols-1"
+        }`}
+      >
+        {Array.from({ length: secondaryCount }, (_, i) => i + 1).map((idx) => (
+          <div
+            key={idx}
+            className="aspect-[4/3] overflow-hidden rounded-xl border border-border bg-secondary"
+          >
+            <img
+              src={images[idx]}
+              alt={`${headline} ${idx + 1}`}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

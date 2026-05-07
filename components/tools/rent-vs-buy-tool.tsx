@@ -108,6 +108,10 @@ export function RentVsBuyTool() {
             <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
               {input.years}년 후 시나리오별 순자산
             </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              y축은 보유 순자산(만원). 월세는 매월 지출이라 시간이 지날수록
+              순자산이 줄어드는 게 정상입니다.
+            </p>
           </div>
           <Badge variant="outline">최적: {SCENARIO_LABEL[result.best]}</Badge>
         </div>
@@ -139,6 +143,9 @@ export function RentVsBuyTool() {
                     <Badge variant="secondary">차이</Badge>
                   )}
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  {input.years}년 후 순자산
+                </p>
                 <p className="text-2xl font-bold tabular-nums">
                   {formatManwon(final, { unit: "auto" })}
                 </p>
