@@ -7,8 +7,12 @@
  */
 
 export const serverEnv = {
-  /** 국토교통부 실거래가 OpenAPI Decoding 키. */
+  /** 국토교통부 아파트 매매 OpenAPI Decoding 키. */
   molitApiKey: process.env.MOLIT_API_KEY,
+  /** 국토교통부 아파트 전월세 OpenAPI 키 (별도 사용신청 필요). */
+  molitPartApiKey: process.env.MOLIT_PART_API_KEY,
+  /** 국토교통부 오피스텔 매매·전월세 OpenAPI 키. */
+  molitOfficeApiKey: process.env.MOLIT_OFFICE_API_KEY,
 } as const;
 
 export const publicEnv = {

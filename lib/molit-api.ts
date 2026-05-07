@@ -143,13 +143,25 @@ function asArray<T>(v: T | T[] | undefined | null): T[] {
   return Array.isArray(v) ? v : [v];
 }
 
+/**
+ * endpoint와 kind에 따라 적절한 키를 선택합니다.
+ * - 아파트 매매:    MOLIT_API_KEY
+ * - 아파트 전월세:  MOLIT_PART_API_KEY (별도 사용신청)
+ * - 오피스텔:       MOLIT_OFFICE_API_KEY
+ */
+function selectApiKey(endpoint: string, kind: DealKind): string {
+  if (endpoint.includes("Offi")) return requireServerEnv("molitOfficeApiKey");
+  if (kind === "rent") return requireServerEnv("molitPartApiKey");
+  return requireServerEnv("molitApiKey");
+}
+
 /** 한 달치 한 페이지 fetch + 정규화. */
 async function fetchPage(
   endpoint: string,
   kind: DealKind,
   params: { lawdCd: string; ymd: string; pageNo: number; numOfRows: number }
 ): Promise<{ deals: AptDeal[]; totalCount: number }> {
-  const apiKey = requireServerEnv("molitApiKey");
+  const apiKey = selectApiKey(endpoint, kind);
   const url = new URL(endpoint);
   // serviceKey는 URLSearchParams가 인코딩하면 이중 인코딩될 수 있어 직접 인코딩
   // 후 string 으로 붙이는 게 가장 호환성 좋음.
