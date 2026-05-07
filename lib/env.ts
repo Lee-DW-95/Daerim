@@ -8,11 +8,18 @@
  *   문자가 fetch invalid value 에러를 유발하는 문제 방지.
  */
 
-/** 앞뒤 공백·개행·따옴표 제거. 빈 문자열은 undefined로. */
+/**
+ * 환경변수 값에서 모든 공백(스페이스·개행·탭)과 따옴표를 제거합니다.
+ *
+ * 단순 trim이 아니라 **모든 위치의 공백 제거**: Vercel 입력란에 긴 JWT 키를
+ * 붙여넣을 때 자동 줄바꿈이 시각적으로만 보이는 게 아니라 실제 \n으로
+ * 들어가는 케이스를 잡습니다. URL·API key·JWT는 내부에 공백이 없으므로
+ * 안전하게 제거 가능합니다.
+ */
 function clean(v: string | undefined): string | undefined {
   if (v == null) return undefined;
-  const trimmed = v.trim().replace(/^["']|["']$/g, "").trim();
-  return trimmed.length > 0 ? trimmed : undefined;
+  const cleaned = v.replace(/\s/g, "").replace(/["'`]/g, "");
+  return cleaned.length > 0 ? cleaned : undefined;
 }
 
 /** URL 형식 보정 — protocol 누락 시 https:// 자동 추가. */
