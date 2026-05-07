@@ -77,14 +77,9 @@ export const toolsNav: NavItem[] = [
     description: "지웰시티 1·2·3차를 시세·학군·교통까지 한눈에 비교",
   },
   {
-    title: "아파트 실거래가 추이",
+    title: "시세 추이 (매매·전세·월세)",
     href: "/tools/price-history",
-    description: "지웰시티 매매·전세 시세 흐름을 라인 차트로",
-  },
-  {
-    title: "오피스텔 전월세 추이",
-    href: "/tools/officetel-price-history",
-    description: "롯데캐슬시티 등 청주 흥덕구 오피스텔 보증금·월세 추이",
+    description: "지웰시티 1·2·3차 + 롯데캐슬시티 모든 단지의 시세 흐름",
   },
   {
     title: "하이닉스 매칭",

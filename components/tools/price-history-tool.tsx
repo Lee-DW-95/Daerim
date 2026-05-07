@@ -20,34 +20,67 @@ export type PriceHistorySeries = {
   medianManwon: number;
   minManwon: number;
   maxManwon: number;
+  /** 월세 거래에서만: 평균 월세 (만원). */
+  avgMonthlyRent?: number;
 };
 
 type Props = {
-  /** 매매 통계. */
+  /** 매매 통계 (아파트). */
   trade: PriceHistorySeries[];
-  /** 전세 통계. */
-  rent: PriceHistorySeries[];
+  /** 전세 통계 (아파트 + 오피스텔, monthlyRent === 0). */
+  jeonse: PriceHistorySeries[];
+  /** 월세 통계 (아파트 + 오피스텔, monthlyRent > 0). */
+  monthly: PriceHistorySeries[];
   /** 차트 x축 전체 월 라벨 (데이터가 빈 달도 표시). */
   monthLabels: string[];
 };
 
-type DealKind = "trade" | "rent";
+type DealMode = "trade" | "jeonse" | "monthly";
 type Metric = "avg" | "median";
 
-export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
-  const availableComplexes = React.useMemo(() => {
-    const ids = new Set<ComplexId>();
-    [...trade, ...rent].forEach((s) => ids.add(s.complexId));
-    return complexes.filter((c) => ids.has(c.id));
-  }, [trade, rent]);
+const DEAL_MODE_LABEL: Record<DealMode, string> = {
+  trade: "매매",
+  jeonse: "전세",
+  monthly: "월세",
+};
 
-  const [kind, setKind] = React.useState<DealKind>("trade");
+const PRICE_LABEL: Record<DealMode, string> = {
+  trade: "매매가",
+  jeonse: "전세 보증금",
+  monthly: "월세 보증금",
+};
+
+export function PriceHistoryTool({ trade, jeonse, monthly, monthLabels }: Props) {
+  const [mode, setMode] = React.useState<DealMode>("trade");
   const [metric, setMetric] = React.useState<Metric>("avg");
-  const [complexId, setComplexId] = React.useState<ComplexId | null>(
-    availableComplexes[0]?.id ?? null
-  );
 
-  const stats = kind === "trade" ? trade : rent;
+  const stats = mode === "trade" ? trade : mode === "jeonse" ? jeonse : monthly;
+
+  // 매매는 아파트만, 전월세는 아파트+오피스텔 통합. 모드별로 매칭 단지가 달라짐.
+  const dataComplexIds = React.useMemo(() => {
+    const set = new Set<ComplexId>();
+    for (const s of stats) set.add(s.complexId);
+    return set;
+  }, [stats]);
+
+  const allComplexes = complexes;
+
+  const [complexId, setComplexId] = React.useState<ComplexId | null>(() => {
+    // 첫 진입 시 매칭된 단지 중 하나 자동 선택
+    for (const c of allComplexes) {
+      if (dataComplexIds.has(c.id)) return c.id;
+    }
+    return null;
+  });
+
+  // 모드 변경 시 현재 단지가 데이터에 없으면 자동 보정
+  React.useEffect(() => {
+    if (!complexId || !dataComplexIds.has(complexId)) {
+      const fallback =
+        allComplexes.find((c) => dataComplexIds.has(c.id))?.id ?? null;
+      setComplexId(fallback);
+    }
+  }, [dataComplexIds, complexId, allComplexes]);
 
   const sizesForComplex = React.useMemo(() => {
     if (!complexId) return [];
@@ -58,11 +91,8 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
     return [...set].sort((a, b) => a - b);
   }, [stats, complexId]);
 
-  const [sizePyeong, setSizePyeong] = React.useState<number | null>(
-    sizesForComplex[0] ?? null
-  );
+  const [sizePyeong, setSizePyeong] = React.useState<number | null>(null);
 
-  // 단지나 거래 종류가 바뀌면 평형 선택을 첫 번째로 자동 보정.
   React.useEffect(() => {
     if (sizesForComplex.length === 0) {
       setSizePyeong(null);
@@ -92,24 +122,28 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
     });
   }, [stats, complexId, sizePyeong, monthLabels]);
 
-  const currentSeriesPoints = chartData.filter((p) => p.count > 0);
-  const totalDeals = currentSeriesPoints.reduce((sum, p) => sum + p.count, 0);
+  const points = chartData.filter((p) => p.count > 0);
+  const totalDeals = points.reduce((sum, p) => sum + p.count, 0);
   const overallAvg =
-    currentSeriesPoints.length === 0
+    totalDeals === 0
       ? 0
       : Math.round(
-          currentSeriesPoints.reduce((sum, p) => sum + p.avgManwon * p.count, 0) /
-            totalDeals
+          points.reduce((s, p) => s + p.avgManwon * p.count, 0) / totalDeals
         );
 
-  if (availableComplexes.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border bg-secondary/40 p-10 text-center text-sm text-muted-foreground">
-        지웰시티 단지에 매칭된 거래가 아직 없습니다. 다음 빌드 시 다시
-        시도됩니다.
-      </div>
+  const monthlyRentAvg = React.useMemo(() => {
+    if (mode !== "monthly" || !complexId || sizePyeong == null) return 0;
+    const filtered = monthly.filter(
+      (s) => s.complexId === complexId && s.sizePyeong === sizePyeong
     );
-  }
+    const totalCount = filtered.reduce((sum, s) => sum + s.count, 0);
+    if (totalCount === 0) return 0;
+    const sum = filtered.reduce(
+      (acc, s) => acc + (s.avgMonthlyRent ?? 0) * s.count,
+      0
+    );
+    return Math.round(sum / totalCount);
+  }, [mode, complexId, sizePyeong, monthly]);
 
   return (
     <div className="space-y-6">
@@ -118,20 +152,23 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
           label="거래 유형"
           options={[
             { value: "trade", label: "매매" },
-            { value: "rent", label: "전세" },
+            { value: "jeonse", label: "전세" },
+            { value: "monthly", label: "월세" },
           ]}
-          value={kind}
-          onChange={(v) => setKind(v as DealKind)}
+          value={mode}
+          onChange={(v) => setMode(v as DealMode)}
         />
-        <ToggleGroup
-          label="가격 기준"
-          options={[
-            { value: "avg", label: "평균" },
-            { value: "median", label: "중위값" },
-          ]}
-          value={metric}
-          onChange={(v) => setMetric(v as Metric)}
-        />
+        {mode !== "monthly" && (
+          <ToggleGroup
+            label="가격 기준"
+            options={[
+              { value: "avg", label: "평균" },
+              { value: "median", label: "중위값" },
+            ]}
+            value={metric}
+            onChange={(v) => setMetric(v as Metric)}
+          />
+        )}
       </div>
 
       <div className="space-y-3">
@@ -139,17 +176,36 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
           단지
         </p>
         <div className="flex flex-wrap gap-2">
-          {availableComplexes.map((c) => (
-            <Button
-              key={c.id}
-              size="sm"
-              variant={complexId === c.id ? "default" : "outline"}
-              onClick={() => setComplexId(c.id)}
-            >
-              {c.shortName} · {c.name}
-            </Button>
-          ))}
+          {allComplexes.map((c) => {
+            const hasData = dataComplexIds.has(c.id);
+            const active = complexId === c.id;
+            return (
+              <Button
+                key={c.id}
+                size="sm"
+                variant={active ? "default" : "outline"}
+                onClick={() => hasData && setComplexId(c.id)}
+                disabled={!hasData}
+                title={
+                  hasData
+                    ? undefined
+                    : `${DEAL_MODE_LABEL[mode]} 거래 데이터 없음`
+                }
+              >
+                {c.shortName} · {c.name}
+                {!hasData && (
+                  <span className="ml-1.5 text-[10px] opacity-70">데이터 없음</span>
+                )}
+              </Button>
+            );
+          })}
         </div>
+        {mode === "trade" && (
+          <p className="text-xs text-muted-foreground">
+            ※ 오피스텔 매매는 별도 사용신청이 필요해 현재 데이터가 비어있을 수
+            있습니다 (전세·월세는 정상).
+          </p>
+        )}
       </div>
 
       {sizesForComplex.length > 0 && (
@@ -180,33 +236,21 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard
           label="총 거래"
-          value={
-            currentSeriesPoints.length === 0
-              ? "—"
-              : formatCount(totalDeals)
-          }
+          value={points.length === 0 ? "—" : formatCount(totalDeals)}
           hint={`${monthLabels.length}개월`}
         />
         <StatCard
-          label={
-            kind === "trade"
-              ? metric === "avg"
-                ? "평균 매매가"
-                : "중위 매매가"
-              : metric === "avg"
-                ? "평균 보증금"
-                : "중위 보증금"
-          }
+          label={metric === "avg" ? `평균 ${PRICE_LABEL[mode]}` : `중위 ${PRICE_LABEL[mode]}`}
           value={overallAvg ? formatManwon(overallAvg, { unit: "auto" }) : "—"}
         />
         <StatCard
           label="최고가"
           value={
-            currentSeriesPoints.length === 0
+            points.length === 0
               ? "—"
               : formatManwon(
                   Math.max(
-                    ...currentSeriesPoints.map((p) =>
+                    ...points.map((p) =>
                       metric === "avg" ? p.avgManwon : p.medianManwon
                     )
                   ),
@@ -215,29 +259,35 @@ export function PriceHistoryTool({ trade, rent, monthLabels }: Props) {
           }
         />
         <StatCard
-          label="최저가"
+          label={mode === "monthly" ? "평균 월세" : "최저가"}
           value={
-            currentSeriesPoints.length === 0
-              ? "—"
-              : formatManwon(
-                  Math.min(
-                    ...currentSeriesPoints.map((p) =>
-                      metric === "avg" ? p.avgManwon : p.medianManwon
-                    )
-                  ),
-                  { unit: "auto" }
-                )
+            mode === "monthly"
+              ? monthlyRentAvg
+                ? `${monthlyRentAvg.toLocaleString("ko-KR")}만원/월`
+                : "—"
+              : points.length === 0
+                ? "—"
+                : formatManwon(
+                    Math.min(
+                      ...points.map((p) =>
+                        metric === "avg" ? p.avgManwon : p.medianManwon
+                      )
+                    ),
+                    { unit: "auto" }
+                  )
           }
         />
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 md:p-6">
-        {currentSeriesPoints.length === 0 ? (
+        {points.length === 0 ? (
           <div
             className="flex w-full items-center justify-center text-sm text-muted-foreground"
             style={{ height: 340 }}
           >
-            선택한 단지·평형의 거래 기록이 없습니다.
+            {complexId == null
+              ? `${DEAL_MODE_LABEL[mode]} 거래 데이터가 있는 단지가 없습니다.`
+              : "선택한 단지·평형의 거래 기록이 없습니다."}
           </div>
         ) : (
           <PriceHistoryChart data={chartData} metric={metric} />
