@@ -11,17 +11,17 @@ export function SiteHeader() {
   const kakao = siteConfig.contact.kakaoChannelUrl;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/50">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 md:h-16 md:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold tracking-tight"
+          className="group flex items-center gap-2 font-semibold tracking-tight"
           aria-label={`${siteConfig.name} 홈으로`}
         >
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-sm transition-transform group-hover:scale-105">
             {siteConfig.shortName}
           </span>
-          <span className="hidden sm:inline-block text-base">
+          <span className="hidden sm:inline-block text-base font-semibold">
             {siteConfig.name}
           </span>
         </Link>

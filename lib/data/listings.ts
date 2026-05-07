@@ -4,10 +4,6 @@ import { getSupabaseAnonClient } from "@/lib/supabase/anon";
 import type { ListingRow } from "@/lib/supabase/types";
 import type { Listing } from "@/lib/types/listing";
 
-import legacyListingsJson from "@/data/listings.json";
-
-const legacyListings = legacyListingsJson as Listing[];
-
 /**
  * Supabase row → 도메인 모델(Listing) 변환.
  * snake_case ↔ camelCase 매핑을 한 곳에 모아둡니다.
@@ -38,9 +34,9 @@ function rowToListing(row: ListingRow): Listing {
 
 async function fetchListings(): Promise<Listing[]> {
   const supabase = getSupabaseAnonClient();
-  // Supabase 미구성 시 JSON 시드를 fallback으로 사용 (개발 초기 단계 안전망).
   if (!supabase) {
-    return [...legacyListings];
+    // Supabase 미설정 시 빈 매물. 운영 시작 전 단계.
+    return [];
   }
 
   const { data, error } = await supabase
@@ -49,11 +45,8 @@ async function fetchListings(): Promise<Listing[]> {
     .order("published_at", { ascending: false });
 
   if (error) {
-    console.warn(
-      "[listings] Supabase fetch 실패 — JSON fallback:",
-      error.message
-    );
-    return [...legacyListings];
+    console.warn("[listings] Supabase fetch 실패:", error.message);
+    return [];
   }
 
   return (data ?? []).map(rowToListing);

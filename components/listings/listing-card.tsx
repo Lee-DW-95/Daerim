@@ -26,60 +26,69 @@ export function ListingCard({ listing }: Props) {
 
   return (
     <Link href={`/listings/${listing.slug}`} className="group block">
-      <Card className="h-full overflow-hidden transition-colors group-hover:border-primary/40">
-        <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+      <Card className="card-lift h-full overflow-hidden border-border/80">
+        <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-secondary to-secondary/40">
           {listing.images.length > 0 ? (
             <img
               src={listing.images[0]}
               alt={listing.headline}
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover transition-transform group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center text-sm text-muted-foreground">
-              <Building2 className="h-10 w-10 opacity-50" />
+              <Building2 className="h-10 w-10 opacity-40" />
               <p className="mt-2 text-xs">사진은 곧 업데이트됩니다</p>
             </div>
           )}
+          {/* gradient overlay for legibility */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 to-transparent"
+          />
           <div className="absolute left-3 top-3 flex gap-1.5">
-            <Badge>{DEAL_KIND_LABEL[listing.dealKind]}</Badge>
+            <Badge className="shadow-sm">
+              {DEAL_KIND_LABEL[listing.dealKind]}
+            </Badge>
             {listing.status !== "available" && (
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="shadow-sm">
                 {STATUS_LABEL[listing.status]}
               </Badge>
             )}
           </div>
         </div>
         <CardContent className="space-y-3 p-5">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">
               {complex?.shortName ?? "단지"}
             </span>
-            <span>·</span>
+            <span className="text-border">|</span>
             <span>{formatPyeong(listing.sizePyeong)}</span>
-            <span>·</span>
-            <span>
+            <span className="text-border">|</span>
+            <span className="tabular-nums">
               {listing.currentFloor}
               {listing.totalFloor ? `/${listing.totalFloor}` : ""}층
             </span>
-            <span>·</span>
+            <span className="text-border">|</span>
             <span className="inline-flex items-center gap-0.5">
               <Compass className="h-3 w-3" />
               {DIRECTION_LABEL[listing.direction]}
             </span>
           </div>
-          <h3 className="line-clamp-2 text-base font-semibold leading-snug">
+          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight">
             {listing.headline}
           </h3>
-          <p className="text-xl font-bold tabular-nums">{priceLabel}</p>
-          <div className="flex items-center justify-between pt-1 text-xs">
+          <p className="text-xl font-bold tabular-nums tracking-tight">
+            {priceLabel}
+          </p>
+          <div className="flex items-center justify-between border-t border-border/60 pt-3 text-xs">
             <span className="text-muted-foreground">
               입주 {listing.availableFrom}
             </span>
-            <span className="inline-flex items-center text-primary group-hover:underline">
+            <span className="inline-flex items-center font-medium text-primary">
               자세히 보기
-              <ArrowRight className="ml-0.5 h-3 w-3" />
+              <ArrowRight className="ml-0.5 h-3 w-3 transition-transform group-hover:translate-x-1" />
             </span>
           </div>
         </CardContent>

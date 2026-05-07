@@ -155,9 +155,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01";
   }
   html {
     @apply font-sans;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   /* 키보드 포커스 표시를 명확히 (마우스 클릭에는 영향 없음) */
   :focus-visible {
@@ -169,6 +173,10 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
+  }
+  /* heading 자간 — Linear/Vercel 스타일 */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
   }
   /* 모션 줄이기 환경 존중 */
   @media (prefers-reduced-motion: reduce) {
@@ -186,5 +194,63 @@
     word-break: keep-all;
     line-break: strict;
     overflow-wrap: break-word;
+  }
+}
+
+@layer components {
+  /* 카드 hover lift — Linear/Vercel 톤 */
+  .card-lift {
+    transition:
+      transform 200ms ease-out,
+      border-color 200ms ease-out,
+      box-shadow 200ms ease-out;
+  }
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 1px 2px 0 rgb(0 0 0 / 0.04),
+      0 8px 24px -8px rgb(0 0 0 / 0.08);
+  }
+  .dark .card-lift:hover {
+    box-shadow:
+      0 1px 2px 0 rgb(0 0 0 / 0.2),
+      0 8px 24px -8px rgb(0 0 0 / 0.4);
+  }
+
+  /* 정교한 noise/grain 배경 (홈 Hero용) */
+  .hero-bg {
+    background:
+      radial-gradient(
+        ellipse 1200px 600px at 50% -10%,
+        color-mix(in oklch, var(--primary) 8%, transparent),
+        transparent
+      ),
+      linear-gradient(180deg, var(--background), var(--background));
+  }
+  .dark .hero-bg {
+    background:
+      radial-gradient(
+        ellipse 1200px 600px at 50% -10%,
+        color-mix(in oklch, var(--brand-gold) 12%, transparent),
+        transparent
+      ),
+      linear-gradient(180deg, var(--background), var(--background));
+  }
+
+  /* 작은 라벨 — eyebrow */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-primary;
+  }
+
+  /* gradient text — heading 강조 */
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      var(--foreground) 0%,
+      color-mix(in oklch, var(--foreground) 70%, var(--brand-gold)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }
