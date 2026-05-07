@@ -6,11 +6,11 @@
     "address": "충청북도 청주시 흥덕구 대농로 17",
     "buildYear": 2010,
     "households": 2164,
-    "buildings": null,
+    "buildings": 9,
     "type": "주상복합",
     "maxFloor": 57,
-    "floorAreaRatio": null,
-    "buildingCoverageRatio": null,
+    "floorAreaRatio": 582,
+    "buildingCoverageRatio": 30,
     "parkingTotal": null,
     "parkingPerHousehold": null,
     "sizes": [38, 49, 59, 63, 77],
@@ -29,7 +29,7 @@
       "seocheongjuIcCarMin": null,
       "osongCarMin": null
     },
-    "tagline": "지웰시티의 랜드마크. 최고 57층 주상복합, 단지내 상가 풍부.",
+    "tagline": "지웰시티의 랜드마크 주상복합. 9개동 2,164세대, 38~77평 라인업.",
     "agentNotes": {
       "pros": [],
       "cons": []
@@ -45,10 +45,10 @@
     "buildings": null,
     "type": "아파트",
     "maxFloor": null,
-    "floorAreaRatio": null,
-    "buildingCoverageRatio": null,
-    "parkingTotal": null,
-    "parkingPerHousehold": null,
+    "floorAreaRatio": 420,
+    "buildingCoverageRatio": 30,
+    "parkingTotal": 3265,
+    "parkingPerHousehold": 1.7,
     "sizes": [33, 39, 49, 59],
     "sizeStats": [],
     "schools": {
@@ -65,7 +65,7 @@
       "seocheongjuIcCarMin": null,
       "osongCarMin": null
     },
-    "tagline": "1차 다음 세대. 평면 개선과 신축 프리미엄.",
+    "tagline": "1차의 평면 단점을 개선한 다음 세대. 1,956세대, 세대당 주차 1.7대.",
     "agentNotes": {
       "pros": [],
       "cons": []
@@ -73,18 +73,18 @@
   },
   {
     "id": "jiwell-3",
-    "name": "청주지웰시티 푸르지오 (3차)",
+    "name": "청주 지웰시티 푸르지오 (3차)",
     "shortName": "3차",
     "address": "충청북도 청주시 흥덕구 복대동",
-    "buildYear": 2021,
-    "households": null,
-    "buildings": null,
+    "buildYear": 2019,
+    "households": 466,
+    "buildings": 2,
     "type": "아파트",
-    "maxFloor": null,
+    "maxFloor": 49,
     "floorAreaRatio": null,
     "buildingCoverageRatio": null,
-    "parkingTotal": null,
-    "parkingPerHousehold": null,
+    "parkingTotal": 689,
+    "parkingPerHousehold": 1.47,
     "sizes": [],
     "sizeStats": [],
     "schools": {
@@ -101,7 +101,7 @@
       "seocheongjuIcCarMin": null,
       "osongCarMin": null
     },
-    "tagline": "지웰시티 신축. 최신 평면과 커뮤니티.",
+    "tagline": "지웰시티 신축 (2019년 10월 입주). 지상 49층 2개동, 아파트 466세대 + 오피스텔 50호.",
     "agentNotes": {
       "pros": [],
       "cons": []
@@ -111,18 +111,23 @@
     "id": "lotte-officetel",
     "name": "대농지구 롯데캐슬시티",
     "shortName": "롯데캐슬",
-    "address": "충청북도 청주시 흥덕구 복대동",
-    "buildYear": null,
-    "households": null,
+    "address": "충청북도 청주시 흥덕구 복대동 288-62",
+    "buildYear": 2017,
+    "households": 527,
     "buildings": null,
     "type": "오피스텔",
-    "maxFloor": null,
+    "maxFloor": 15,
     "floorAreaRatio": null,
     "buildingCoverageRatio": null,
     "parkingTotal": null,
     "parkingPerHousehold": null,
-    "sizes": [],
+    "sizes": [9, 10, 11, 12, 13, 14, 15, 16],
     "sizeStats": [],
+    "schools": {
+      "elementary": ["서촌초", "솔밭초"],
+      "middle": ["복대중"],
+      "high": ["흥덕고"]
+    },
     "amenities": {
       "jiwellMallWalkMin": null,
       "hyundaiDeptWalkMin": null
@@ -132,7 +137,7 @@
       "seocheongjuIcCarMin": null,
       "osongCarMin": null
     },
-    "tagline": "복대동 대농지구 롯데캐슬시티 오피스텔. 1인·신혼 거주 + SK하이닉스 임시 거주 인기.",
+    "tagline": "복대동 대농3지구 오피스텔. 527실, 전용 28~53㎡ 9가지 평면. 1인·신혼·SK하이닉스 임시 거주 인기.",
     "agentNotes": {
       "pros": [],
       "cons": []
